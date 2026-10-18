@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "ok",
+      "observed_at": "2026-10-15T14:00:00Z",
+      "source_updated_at": null,
+      "age_ms": 0,
+      "last_error_code": null
+    },
+    "cpu": {
+      "model": "Test CPU",
+      "load_percent": {
+        "value": 0,
+        "reason": null
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "sensor_unsupported"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": 8589934592,
+        "reason": null
+      },
+      "memory_total_bytes": {
+        "value": 17179869184,
+        "reason": null
+      }
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "disks": []
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "running",
+    "quotas": [],
+    "sessions": [
+      {
+        "id": "test-session",
+        "title": "项目开发与进度整理",
+        "state": "running",
+        "title_reason": null,
+        "started_at": "2026-10-16T00:00:00Z",
+        "running_duration_ms": 3723000,
+        "duration_reason": null
+      }
+    ]
+  },
+  "boot_id": "00000000-0000-4000-8000-000000000001",
+  "seq": 0,
+  "sampled_at": "2026-10-15T14:00:00Z"
+}

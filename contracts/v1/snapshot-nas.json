@@ -1,0 +1,338 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "cpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "disks": [
+      {
+        "id": "C:\\",
+        "model": "Example NVMe SSD",
+        "total_bytes": {
+          "value": 1000204886016,
+          "reason": null
+        },
+        "free_bytes": {
+          "value": 400000000000,
+          "reason": null
+        },
+        "busy_percent": {
+          "value": 12.5,
+          "reason": null
+        },
+        "read_ms": {
+          "value": 0.4,
+          "reason": null
+        },
+        "write_ms": {
+          "value": null,
+          "reason": "disk_no_io"
+        },
+        "response_ms": {
+          "value": 0.4,
+          "reason": null
+        },
+        "read_bytes_per_second": {
+          "value": 5242880,
+          "reason": null
+        },
+        "write_bytes_per_second": {
+          "value": 0,
+          "reason": null
+        }
+      }
+    ]
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "unknown",
+    "quotas": [],
+    "sessions": []
+  },
+  "generated_at": "2026-10-17T13:21:00Z",
+  "net": {
+    "wan": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "download_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "upload_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "services": {
+      "proxy": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "dhcp": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "clash": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "antiad": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      }
+    },
+    "vpn": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "remaining_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_origin": null
+    },
+    "antiad_rule_count": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "antiad_rules_updated_at": null
+  },
+  "home": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "entities": []
+  },
+  "weather": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "location": null,
+    "condition": null,
+    "temperature_c": {
+      "value": null,
+      "reason": "not_configured"
+    }
+  },
+  "sun": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "sunrise_at": null,
+    "sunset_at": null
+  },
+  "alerts": [],
+  "nas": {
+    "source": {
+      "quality": "ok",
+      "observed_at": "2026-10-17T13:21:00Z",
+      "source_updated_at": null,
+      "age_ms": 800,
+      "last_error_code": null
+    },
+    "cpu_percent": {
+      "value": 22.5,
+      "reason": null
+    },
+    "memory_percent": {
+      "value": 72.3,
+      "reason": null
+    },
+    "memory_total_bytes": {
+      "value": 2056081408,
+      "reason": null
+    },
+    "soc_temperature_c": {
+      "value": 44.4,
+      "reason": null
+    },
+    "gpu_temperature_c": {
+      "value": 43.8,
+      "reason": null
+    },
+    "disk_temperature_c": {
+      "value": 41,
+      "reason": null
+    },
+    "disk_busy_percent": {
+      "value": 12.5,
+      "reason": null
+    },
+    "disk_read_bytes_per_second": {
+      "value": 5242880,
+      "reason": null
+    },
+    "disk_write_bytes_per_second": {
+      "value": 0,
+      "reason": null
+    },
+    "disk_wake_count_today": {
+      "value": 3,
+      "reason": null
+    },
+    "emmc_busy_percent": {
+      "value": 3.5,
+      "reason": null
+    },
+    "emmc_read_bytes_per_second": {
+      "value": 1048576,
+      "reason": null
+    },
+    "emmc_write_bytes_per_second": {
+      "value": 2048,
+      "reason": null
+    },
+    "disk_health": "good",
+    "disk_power_on_hours": {
+      "value": 11234,
+      "reason": null
+    },
+    "disk_reallocated_sectors": {
+      "value": 0,
+      "reason": null
+    },
+    "disk_pending_sectors": {
+      "value": 0,
+      "reason": null
+    },
+    "disk_crc_errors": {
+      "value": 2,
+      "reason": null
+    },
+    "disk_power_cycles": {
+      "value": 56,
+      "reason": null
+    },
+    "disk_load_cycles": {
+      "value": 3000,
+      "reason": null
+    },
+    "disk_state": "active"
+  }
+}

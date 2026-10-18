@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "action": {
+      "enum": [
+        "turn_on",
+        "turn_off",
+        "set_temperature",
+        "open_cover",
+        "close_cover",
+        "stop_cover",
+        "set_hvac_mode",
+        "set_brightness",
+        "set_color_temperature",
+        "set_percentage",
+        "set_preset_mode",
+        "set_mode",
+        "set_humidity",
+        "lock",
+        "unlock",
+        "press"
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "temperature_c": {
+      "type": "number",
+      "minimum": -100,
+      "maximum": 200
+    },
+    "control_epoch": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "brightness_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "color_temperature_kelvin": {
+      "type": "number",
+      "minimum": 1000,
+      "maximum": 20000
+    },
+    "percentage": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "humidity_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "mode": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16
+    }
+  },
+  "required": [
+    "request_id",
+    "entity_id",
+    "action",
+    "expires_at",
+    "control_epoch"
+  ],
+  "additionalProperties": false,
+  "$defs": {}
+}

@@ -1,0 +1,4 @@
+dependencies:
+  espressif/esp_hosted: "2.12.9"
+  espressif/esp_wifi_remote: "1.6.1"
+  idf: ">=6.1"

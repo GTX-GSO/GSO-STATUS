@@ -1,0 +1,8 @@
+{
+  "listen": "127.0.0.1:17890",
+  "agent_id": "desktop",
+  "write_token": "REPLACE_WITH_32_OR_MORE_RANDOM_CHARACTERS_WRITE",
+  "read_token": "REPLACE_WITH_32_OR_MORE_RANDOM_CHARACTERS_READ",
+  "router_url": "",
+  "printer": {"host": "", "access_code": ""}
+}

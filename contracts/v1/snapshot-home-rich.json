@@ -1,0 +1,387 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "cpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "disks": []
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "unknown",
+    "quotas": [],
+    "sessions": []
+  },
+  "generated_at": "2026-10-15T14:00:00Z",
+  "net": {
+    "wan": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "download_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "upload_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "services": {
+      "proxy": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "dhcp": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "clash": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "antiad": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      }
+    },
+    "vpn": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "remaining_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_origin": null
+    },
+    "antiad_rule_count": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "antiad_rules_updated_at": null
+  },
+  "home": {
+    "source": {
+      "quality": "ok",
+      "observed_at": "2026-10-16T00:00:00Z",
+      "source_updated_at": null,
+      "age_ms": 0,
+      "last_error_code": null
+    },
+    "control_epoch": "12345678-1234-4234-8234-123456789012",
+    "entities": [
+      {
+        "entity_id": "light.test",
+        "name": "\u5ba2\u5385\u706f",
+        "state": "on",
+        "source": {
+          "quality": "ok",
+          "observed_at": "2026-10-16T00:00:00Z",
+          "source_updated_at": null,
+          "age_ms": 0,
+          "last_error_code": null
+        },
+        "current_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "target_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "min_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "max_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "temperature_step_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "actions": [
+          "turn_on",
+          "turn_off",
+          "set_brightness",
+          "set_color_temperature"
+        ],
+        "brightness_percent": {
+          "value": 80,
+          "reason": null
+        },
+        "color_temperature_kelvin": {
+          "value": 4000,
+          "reason": null
+        },
+        "min_color_temperature_kelvin": {
+          "value": 2700,
+          "reason": null
+        },
+        "max_color_temperature_kelvin": {
+          "value": 6500,
+          "reason": null
+        }
+      },
+      {
+        "entity_id": "climate.test",
+        "name": "\u5ba2\u5385\u7a7a\u8c03",
+        "state": "cool",
+        "source": {
+          "quality": "ok",
+          "observed_at": "2026-10-16T00:00:00Z",
+          "source_updated_at": null,
+          "age_ms": 0,
+          "last_error_code": null
+        },
+        "current_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "target_temperature_c": {
+          "value": 25,
+          "reason": null
+        },
+        "min_temperature_c": {
+          "value": 16,
+          "reason": null
+        },
+        "max_temperature_c": {
+          "value": 30,
+          "reason": null
+        },
+        "temperature_step_c": {
+          "value": 1,
+          "reason": null
+        },
+        "actions": [
+          "turn_on",
+          "turn_off",
+          "set_temperature",
+          "set_hvac_mode"
+        ],
+        "modes": [
+          "cool",
+          "off"
+        ],
+        "mode": "cool"
+      },
+      {
+        "entity_id": "cover.left",
+        "name": "\u5de6\u7a97\u5e18",
+        "state": "opening",
+        "source": {
+          "quality": "ok",
+          "observed_at": "2026-10-16T00:00:00Z",
+          "source_updated_at": null,
+          "age_ms": 0,
+          "last_error_code": null
+        },
+        "current_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "target_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "min_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "max_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "temperature_step_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "actions": [
+          "open_cover",
+          "close_cover",
+          "stop_cover"
+        ]
+      },
+      {
+        "entity_id": "cover.right",
+        "name": "\u53f3\u7a97\u5e18",
+        "state": "closed",
+        "source": {
+          "quality": "ok",
+          "observed_at": "2026-10-16T00:00:00Z",
+          "source_updated_at": null,
+          "age_ms": 0,
+          "last_error_code": null
+        },
+        "current_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "target_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "min_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "max_temperature_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "temperature_step_c": {
+          "value": null,
+          "reason": "not_available"
+        },
+        "actions": [
+          "open_cover",
+          "close_cover",
+          "stop_cover"
+        ]
+      }
+    ]
+  },
+  "weather": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "location": null,
+    "condition": null,
+    "temperature_c": {
+      "value": null,
+      "reason": "not_configured"
+    }
+  },
+  "sun": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "sunrise_at": null,
+    "sunset_at": null
+  },
+  "alerts": []
+}

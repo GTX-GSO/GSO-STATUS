@@ -1,0 +1,7 @@
+{
+  "SnapshotBaseUrl": "http://127.0.0.1:17890",
+  "AgentId": "desktop",
+  "WriteToken": "REPLACE_WITH_MATCHING_GSN_WRITE_TOKEN",
+  "GpuIndex": 0,
+  "Drives": ["C:\\", "D:\\", "E:\\"]
+}

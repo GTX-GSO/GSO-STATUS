@@ -1,0 +1,433 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "cpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "clock_mhz": {
+        "value": 4200,
+        "reason": null
+      },
+      "memory_rate_mts": {
+        "value": 3600,
+        "reason": null
+      },
+      "memory_clock_mhz": {
+        "value": 1800,
+        "reason": null
+      },
+      "memory_clock_source": "configured_ddr"
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "clock_mhz": {
+        "value": 2700,
+        "reason": null
+      },
+      "memory_clock_mhz": {
+        "value": 10701,
+        "reason": null
+      }
+    },
+    "disks": []
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "running",
+    "quotas": [],
+    "sessions": [
+      {
+        "id": "test-session",
+        "title": "项目开发与进度整理",
+        "state": "running",
+        "title_reason": null,
+        "started_at": "2026-10-16T00:00:00Z",
+        "running_duration_ms": 3723000,
+        "duration_reason": null
+      }
+    ]
+  },
+  "generated_at": "2026-10-15T14:00:00Z",
+  "net": {
+    "wan": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "download_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "upload_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "services": {
+      "proxy": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "dhcp": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "clash": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "antiad": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      }
+    },
+    "vpn": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "remaining_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_origin": null
+    },
+    "antiad_rule_count": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "antiad_rules_updated_at": null
+  },
+  "home": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "entities": []
+  },
+  "weather": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "location": "深圳市光明区",
+    "condition": "cloudy",
+    "temperature_c": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "humidity_percent": {
+      "value": 59,
+      "reason": null
+    },
+    "pressure_hpa": {
+      "value": 1016.9,
+      "reason": null
+    },
+    "wind_speed_kmh": {
+      "value": 12.2,
+      "reason": null
+    },
+    "wind_bearing_degrees": {
+      "value": 112.5,
+      "reason": null
+    },
+    "forecast": [
+      {
+        "datetime": "2026-10-16T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-17T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-18T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-19T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-20T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-21T00:00:00Z",
+        "condition": "cloudy",
+        "high_c": {
+          "value": 31.9,
+          "reason": null
+        },
+        "low_c": {
+          "value": 25.1,
+          "reason": null
+        }
+      }
+    ],
+    "hourly_forecast": [
+      {
+        "datetime": "2026-10-16T00:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T01:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T02:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T03:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T04:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T05:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T06:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T07:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T08:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T09:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T10:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      },
+      {
+        "datetime": "2026-10-16T11:00:00Z",
+        "condition": "partlycloudy",
+        "temperature_c": {
+          "value": 30.3,
+          "reason": null
+        }
+      }
+    ]
+  },
+  "sun": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "sunrise_at": null,
+    "sunset_at": null
+  },
+  "alerts": []
+}

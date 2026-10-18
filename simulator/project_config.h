@@ -1,0 +1,5 @@
+#pragma once
+#define GSO_POLL_INTERVAL_MS 1000
+#define GSO_HISTORY_POINTS 24
+#define GSO_CPU_MODEL "Ryzen 9 3900X"
+#define GSO_GPU_MODEL "RTX 4070 Ti"

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entity_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "action": {
+      "enum": [
+        "turn_on",
+        "turn_off",
+        "set_temperature",
+        "open_cover",
+        "close_cover",
+        "stop_cover",
+        "set_hvac_mode",
+        "set_brightness",
+        "set_color_temperature",
+        "set_percentage",
+        "set_preset_mode",
+        "set_mode",
+        "set_humidity",
+        "lock",
+        "unlock",
+        "press"
+      ]
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "sent",
+        "confirmed",
+        "timed_out",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "error_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 160
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "command_id",
+    "entity_id",
+    "action",
+    "status",
+    "error_code",
+    "created_at",
+    "updated_at",
+    "expires_at"
+  ],
+  "additionalProperties": false,
+  "$defs": {}
+}

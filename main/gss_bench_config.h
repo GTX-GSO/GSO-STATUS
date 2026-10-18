@@ -1,0 +1,1 @@
+/* Normal firmware: no benchmark */

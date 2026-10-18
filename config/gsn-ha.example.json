@@ -1,0 +1,60 @@
+{
+  "listen": "127.0.0.1:17890",
+  "agent_id": "desktop",
+  "write_token": "REPLACE_WITH_32_OR_MORE_RANDOM_CHARACTERS_WRITE",
+  "read_token": "REPLACE_WITH_32_OR_MORE_RANDOM_CHARACTERS_READ",
+  "router_url": "http://192.168.124.1/mobile.asp",
+  "ha": {
+    "base_url": "http://192.168.124.14:35008",
+    "token": "REPLACE_WITH_HA_TOKEN_LOCALLY",
+    "location": "",
+    "entities": {
+      "proxy": "sensor.gayso_forwarding_status",
+      "dhcp": "sensor.gayso_dhcp_status",
+      "antiad": "sensor.gayso_ad_filter",
+      "antiad_rule_count": "sensor.gayso_anti_ad_count",
+      "antiad_rules_updated": "sensor.gayso_anti_ad_updated",
+      "vpn_remaining": "sensor.gayso_subscription_remaining",
+      "vpn_updated": "sensor.gayso_subscription_updated",
+      "weather": "weather.forecast_wo_de_jia",
+      "sun": "sun.sun",
+      "dhcp_active_leases": "sensor.gayso_dhcp_active_leases",
+      "ambient_light": "sensor.study_illuminance"
+    },
+    "vpn_total_bytes": null,
+    "vpn_total_origin": "",
+    "home": [],
+    "temperature_unit": "",
+    "car": {
+      "name": "零跑C11",
+      "entities": {
+        "state": "sensor.ling_pao_c11_che_liang_zhuang_tai",
+        "battery": "sensor.ling_pao_c11_dian_liang",
+        "range": "sensor.ling_pao_c11_xu_hang",
+        "charge": "sensor.ling_pao_c11_chong_dian_zhuang_tai",
+        "updated": "sensor.ling_pao_c11_zhuang_tai_geng_xin_shi_jian",
+        "cabin": "sensor.ling_pao_c11_che_nei_wen_du",
+        "odometer": "sensor.ling_pao_c11_zong_li_cheng",
+        "week": "sensor.ling_pao_c11_jin_7tian_li_cheng",
+        "consumption": "sensor.ling_pao_c11_bai_gong_li_neng_hao",
+        "tyre_fl": "sensor.ling_pao_c11_tai_ya_zuo_qian",
+        "tyre_fr": "sensor.ling_pao_c11_tai_ya_you_qian",
+        "tyre_rl": "sensor.ling_pao_c11_tai_ya_zuo_hou",
+        "tyre_rr": "sensor.ling_pao_c11_tai_ya_you_hou",
+        "lock": "lock.ling_pao_c11_che_men_suo",
+        "refresh": "button.ling_pao_c11_shua_xin_che_kuang"
+      },
+      "actions": []
+    }
+  },
+  "mihomo": {
+    "base_url": "http://192.168.124.14:9090",
+    "token": "REPLACE_WITH_EXISTING_MIHOMO_TOKEN_LOCALLY"
+  },
+  "home_control_token": "",
+  "nas": {
+    "disk": "/dev/sda",
+    "disk_io_only": true,
+    "disk_interval_seconds": 120
+  }
+}

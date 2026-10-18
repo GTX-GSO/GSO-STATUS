@@ -1,0 +1,3 @@
+Driver source: https://github.com/iKalyes/ESP32P4_AXS15260D_MIPI_6.2in
+Source files retain Apache-2.0 SPDX headers; repository MIT license also preserved.
+Board pin configuration is extracted from the user-provided AIBOX R3 original image, not copied from the reference board.

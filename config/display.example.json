@@ -1,0 +1,7 @@
+{
+  "url": "http://127.0.0.1:17890/api/v1/snapshot",
+  "read_token": "REPLACE_WITH_MATCHING_GSN_READ_TOKEN",
+  "home_control_token": "",
+  "mihomo_url": "",
+  "mihomo_token": ""
+}

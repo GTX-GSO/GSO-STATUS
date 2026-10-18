@@ -1,0 +1,20 @@
+/* Vector weather symbols: one widget per icon, no bitmap or decoded-image cache. */
+enum {WX_SUN=1,WX_CLOUD=2,WX_RAIN=4,WX_SNOW=8,WX_BOLT=16,WX_FOG=32,WX_WIND=64,WX_NIGHT=128,WX_HAIL=256,WX_ALERT=512};
+static unsigned weather_symbol(const char *s){if(!strcmp(s,"sunny"))return WX_SUN;if(!strcmp(s,"clear-night"))return WX_NIGHT;if(!strcmp(s,"cloudy"))return WX_CLOUD;if(!strcmp(s,"partlycloudy"))return WX_CLOUD|WX_SUN;if(!strcmp(s,"rainy")||!strcmp(s,"pouring"))return WX_CLOUD|WX_RAIN;if(!strcmp(s,"snowy"))return WX_CLOUD|WX_SNOW;if(!strcmp(s,"hail"))return WX_CLOUD|WX_HAIL;if(!strcmp(s,"exceptional"))return WX_ALERT;if(!strcmp(s,"snowy-rainy"))return WX_CLOUD|WX_RAIN|WX_SNOW;if(!strcmp(s,"lightning"))return WX_CLOUD|WX_BOLT;if(!strcmp(s,"lightning-rainy"))return WX_CLOUD|WX_RAIN|WX_BOLT;if(!strcmp(s,"fog"))return WX_FOG;if(!strcmp(s,"windy")||!strcmp(s,"windy-variant"))return WX_WIND;return 0;}
+static void wx_rect(lv_layer_t *layer,lv_area_t a,int size,int x,int y,int w,int h,uint32_t color,bool circle){lv_draw_rect_dsc_t d;lv_draw_rect_dsc_init(&d);d.bg_color=lv_color_hex(color);d.bg_opa=255;d.radius=circle?LV_RADIUS_CIRCLE:0;lv_area_t r={a.x1+x*size/32,a.y1+y*size/32,a.x1+(x+w)*size/32,a.y1+(y+h)*size/32};lv_draw_rect(layer,&d,&r);}
+static void wx_line(lv_layer_t *layer,lv_area_t a,int size,int x,int y,int x2,int y2,uint32_t color){lv_draw_line_dsc_t d;lv_draw_line_dsc_init(&d);d.p1.x=a.x1+x*size/32;d.p1.y=a.y1+y*size/32;d.p2.x=a.x1+x2*size/32;d.p2.y=a.y1+y2*size/32;d.color=lv_color_hex(color);d.width=size>40?3:2;d.round_start=d.round_end=1;lv_draw_line(layer,&d);}
+static void weather_icon_draw(lv_event_t *e){lv_obj_t *o=lv_event_get_target_obj(e);lv_area_t a;lv_obj_get_coords(o,&a);int size=lv_obj_get_width(o);unsigned flags=(unsigned)(uintptr_t)lv_obj_get_user_data(o);lv_layer_t *layer=lv_event_get_layer(e);
+ if(flags&WX_SUN){wx_rect(layer,a,size,3,2,16,16,0xF2CF55,true);if(!(flags&WX_CLOUD)){wx_line(layer,a,size,11,0,11,2,0xF2CF55);wx_line(layer,a,size,0,10,2,10,0xF2CF55);wx_line(layer,a,size,20,10,23,10,0xF2CF55);wx_line(layer,a,size,11,20,11,23,0xF2CF55);}}
+ if(flags&WX_NIGHT){wx_rect(layer,a,size,5,3,23,23,0xF7E59B,true);lv_color_t bg=lv_obj_get_style_bg_color(lv_obj_get_parent(o),0);wx_rect(layer,a,size,14,0,20,22,lv_color_to_u32(bg)&0xffffff,true);}
+ if(flags&WX_CLOUD){wx_rect(layer,a,size,7,10,15,15,0xA7B8C9,true);wx_rect(layer,a,size,12,5,15,20,0xA7B8C9,true);wx_rect(layer,a,size,3,16,23,10,0xD3DFE9,true);wx_rect(layer,a,size,16,13,14,13,0xD3DFE9,true);}
+ if(flags&WX_RAIN)for(int i=0;i<3;i++)wx_line(layer,a,size,8+i*8,27,6+i*8,31,0x65B9F4);
+ if(flags&WX_HAIL){wx_rect(layer,a,size,8,27,3,3,0xB4DCF5,true);wx_rect(layer,a,size,21,28,3,3,0xB4DCF5,true);}
+ if(flags&WX_ALERT){wx_line(layer,a,size,16,3,2,28,0xE6B962);wx_line(layer,a,size,2,28,30,28,0xE6B962);wx_line(layer,a,size,30,28,16,3,0xE6B962);wx_line(layer,a,size,16,12,16,19,0xE6B962);wx_rect(layer,a,size,15,23,2,2,0xE6B962,true);}
+ if(flags&WX_SNOW){wx_line(layer,a,size,15,26,15,31,0xB4DCF5);wx_line(layer,a,size,12,28,18,28,0xB4DCF5);}
+ if(flags&WX_BOLT){wx_line(layer,a,size,19,19,13,26,0xF2CF55);wx_line(layer,a,size,13,26,20,24,0xF2CF55);wx_line(layer,a,size,20,24,16,31,0xF2CF55);}
+ if(flags&(WX_FOG|WX_WIND))for(int i=0;i<3;i++)wx_line(layer,a,size,3+i*2,8+i*7,28-i*3,8+i*7,0x9FB5C8);
+ if(flags&WX_WIND){wx_line(layer,a,size,26,8,29,6,0x9FB5C8);wx_line(layer,a,size,29,6,26,3,0x9FB5C8);}
+ if(!flags)wx_line(layer,a,size,10,16,22,16,0x9FB5C8);
+}
+static lv_obj_t *weather_icon_create(lv_obj_t *p,int x,int y,int size){lv_obj_t *o=lv_obj_create(p);lv_obj_remove_style_all(o);lv_obj_set_pos(o,x,y);lv_obj_set_size(o,size,size);lv_obj_remove_flag(o,LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_SCROLLABLE);lv_obj_add_event_cb(o,weather_icon_draw,LV_EVENT_DRAW_MAIN,NULL);return o;}
+static void weather_icon_update(lv_obj_t *o,const char *s){if(!o)return;unsigned flags=weather_symbol(s);if((uintptr_t)lv_obj_get_user_data(o)!=flags){lv_obj_set_user_data(o,(void *)(uintptr_t)flags);lv_obj_invalidate(o);}}

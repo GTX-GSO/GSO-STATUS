@@ -1,0 +1,71 @@
+{
+  "dotnet_sdk": {
+    "version": "10.0.402",
+    "runtime": "10.0.13",
+    "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.402/dotnet-sdk-10.0.402-win-x64.zip",
+    "sha512": "ae4fd528cb7e9f6af6aaf7de36715a69f761f183744f1bb3025d19f5a92447090ec561410e46266c1d10a63781ed6f3de771760bc76c876d87daabc367b898cd"
+  },
+  "go": {
+    "version": "go1.27.2",
+    "url": "https://go.dev/dl/go1.27.2.windows-amd64.zip",
+    "sha256": "1314008898bd40df77af4b014f777f08873dbdfbcd3d92308728ee03304fe04f"
+  },
+  "cjson": {
+    "version": "1.7.19",
+    "source": "https://github.com/DaveGamble/cJSON/tree/v1.7.19",
+    "vendor/cjson/cJSON.c_sha256": "298581a04a36c0165da4b0aade235c23088cb2faa58651d720ea2f3706ed0b0d",
+    "vendor/cjson/cJSON.h_sha256": "25b0145150d500498e4d209cec69c18c42cf818bffcc54690be3b895a2a16dee"
+  },
+  "ca_bundle": {
+    "source": "https://curl.se/ca/cacert.pem",
+    "mozilla_snapshot": "2026-09-25",
+    "vendor/cacert/cacert.pem_sha256": "a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505"
+  },
+  "cpu_sensors": {
+    "librehardwaremonitorlib": "0.9.6",
+    "source_commit": "3d331e3370efb858411f19511373eff65a218701",
+    "nupkg_sha256": "60db5e0d9135f4658b385cae139d3b9eaeac0a8e867d322d20b5dbe4c4039197",
+    "pawnio_url": "https://github.com/namazso/PawnIO.Setup/releases/latest/download/PawnIO_setup.exe",
+    "pawnio_setup_sha256": "1f519a22e47187f70a1379a48ca604981c4fcf694f4e65b734aaa74a9fba3032",
+    "pawnio_signature_verified": true
+  },
+  "go_websocket": {
+    "module": "github.com/coder/websocket",
+    "version": "v1.8.15",
+    "source": "https://github.com/coder/websocket/tree/v1.8.15",
+    "module_sum": "h1:6B2JPeOGlpff2Uz6vOEH1Vzpi0iUz20A+lPVhPHtNUA=",
+    "license": "ISC",
+    "vendored": true
+  },
+  "presentmon_candidate": {
+    "version": "2.6.0",
+    "url": "https://github.com/GameTechDev/PresentMon/releases/download/v2.6.0/PresentMon-2.6.0-x64.exe",
+    "sha256": "b2a706bc6ad475749e3b7e3409263aa1e6906d45bdcf993f6dbc0f660188f1af",
+    "status": "official CLI verified; GSW adapter and actual game validation pending; not bundled in release"
+  },
+  "esp32p4": {
+    "esp_idf": "v6.1",
+    "esp_idf_commit": "fff9895c82d744c7237be8847347bdd1b07c6643",
+    "compiler": "riscv32-esp-elf-gcc 15.2.0 esp-15.2.0_20251204",
+    "esptool": "5.5.0",
+    "lvgl": "9.4.0",
+    "lvgl_source": "vendor/lvgl",
+    "board": "ESP32P4X AIBOX R3, chip v3.2",
+    "driver_reference": "https://github.com/iKalyes/ESP32P4_AXS15260D_MIPI_6.2in",
+    "driver_file_sha256": {
+      "esp_lcd_axs15260.c": "67e6c4a425bb60570b966513a0df7825b3588d666a0ce99adefe2eb9c41239bd",
+      "esp_lcd_touch_axs15260.c": "d7485d8e3c25a759d853881716aed315f0571986f80198099a76575360125de8"
+    },
+    "renderer_compile_optimization": "-O2 (main and gso_lvgl components)",
+    "display_pipeline": "RGB565 LVGL draw buffer; PPA to RGB888 scanout; DMA frame-completion synchronization",
+    "installation_record": "C:/Espressif/tools/eim_idf.json",
+    "idf_tools_path": "C:/Espressif/tools",
+    "python": "C:/Espressif/tools/python/v6.1/venv/Scripts/python.exe",
+    "environment_loader": "scripts/esp-idf-env.ps1",
+    "python_constraints_checked": true,
+    "vendor_references": {
+      "mipi_branch_commit": "4dc245529e592cb3bb1ff64cea3841a7e1f0503e",
+      "p4xc5_commit": "8c6bc38bc7a082d9c4475e08c40778442a8dd8be"
+    }
+  }
+}

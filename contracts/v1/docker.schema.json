@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "state",
+        "running",
+        "health",
+        "observed_at",
+        "error"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "state": {
+          "enum": [
+            null,
+            "created",
+            "running",
+            "paused",
+            "restarting",
+            "removing",
+            "exited",
+            "dead"
+          ]
+        },
+        "running": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "health": {
+          "enum": [
+            null,
+            "none",
+            "starting",
+            "healthy",
+            "unhealthy"
+          ]
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 64
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "enabled",
+    "containers"
+  ],
+  "properties": {
+    "enabled": {
+      "type": "boolean"
+    },
+    "containers": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/container"
+      }
+    }
+  }
+}

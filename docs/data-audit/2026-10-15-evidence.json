@@ -1,0 +1,496 @@
+{
+  "observed_date": "2026-10-15",
+  "timezone": "Asia/Hong_Kong",
+  "scope": "Read-only local/HA/source feasibility check; not an end-to-end device deployment test",
+  "ha_url": "http://192.168.124.14:35008",
+  "ha_rest_anonymous_status": 401,
+  "mihomo_anonymous_version_status": 401,
+  "windows": {
+    "observed_at": "2026-10-15T20:33:19.7765226+08:00",
+    "cpu": {
+      "Name": "AMD Ryzen 9 3900X 12-Core Processor            ",
+      "NumberOfCores": 12,
+      "NumberOfLogicalProcessors": 24,
+      "LoadPercentage": 17
+    },
+    "cpu_load": {
+      "Name": "_Total",
+      "PercentProcessorTime": 3
+    },
+    "ram": {
+      "TotalVisibleMemorySize": 33464832,
+      "FreePhysicalMemory": 17566868
+    },
+    "physical_ram": {
+      "Sum": 34359738368.0
+    },
+    "gpu": [
+      {
+        "Name": "OrayIddDriver Device",
+        "DriverVersion": "17.50.19.949"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 4070 Ti",
+        "DriverVersion": "32.0.16.1664"
+      }
+    ],
+    "gpu_memory": [
+      {
+        "Name": "luid_0x00000000_0x00012B6D_phys_0",
+        "DedicatedUsage": 0,
+        "SharedUsage": 8192,
+        "TotalCommitted": 55857152
+      },
+      {
+        "Name": "luid_0x00000000_0x000118A3_phys_0",
+        "DedicatedUsage": 1812234240,
+        "SharedUsage": 125005824,
+        "TotalCommitted": 2115911680
+      }
+    ],
+    "gpu_3d_engines": [
+      {
+        "Name": "pid_10396_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_1220_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_12524_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_12988_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_14120_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_1648_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_16704_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_16716_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_17076_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_17716_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_18696_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      },
+      {
+        "Name": "pid_18852_luid_0x00000000_0x000118A3_phys_0_eng_0_engtype_3D",
+        "UtilizationPercentage": 0
+      }
+    ],
+    "nvidia": "NVIDIA GeForce RTX 4070 Ti, 4, 59, 44.69, 1722, 12282",
+    "disks": [
+      {
+        "DeviceID": "C:",
+        "VolumeName": "KioxiaRC20",
+        "Size": 998471585792,
+        "FreeSpace": 227519275008
+      },
+      {
+        "DeviceID": "D:",
+        "VolumeName": "SeagateHDD",
+        "Size": 1000202039296,
+        "FreeSpace": 959662903296
+      },
+      {
+        "DeviceID": "E:",
+        "VolumeName": "Micron1100",
+        "Size": 1024208138240,
+        "FreeSpace": 962232565760
+      }
+    ],
+    "network": {
+      "Name": "Intel[R] I211 Gigabit Network Connection",
+      "BytesReceivedPersec": 3682,
+      "BytesSentPersec": 26186
+    },
+    "sensor_tools_running": null,
+    "sensor_tools_installed": [
+      {
+        "DisplayName": "MSI Afterburner 4.6.5 Beta 2",
+        "DisplayVersion": "4.6.5 Beta 2"
+      },
+      {
+        "DisplayName": "RivaTuner Statistics Server 7.3.4 Beta 3",
+        "DisplayVersion": "7.3.4 Beta 3"
+      }
+    ],
+    "lhm_sensors": {
+      "error": "无效命名空间 "
+    },
+    "ohm_sensors": {
+      "error": "无效命名空间 "
+    },
+    "acpi_thermal": {
+      "error": "不支持 "
+    }
+  },
+  "nvml": {
+    "observed_at": "2026-10-15T20:37:08+0800",
+    "source": "NVIDIA NVML direct read",
+    "samples": [
+      {
+        "at": "20:37:08",
+        "return_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gpu_percent": 1,
+        "vram_used_bytes": 2384998400,
+        "vram_total_bytes": 12878610432,
+        "temperature_c": 43,
+        "power_w": 37.509
+      },
+      {
+        "at": "20:37:09",
+        "return_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gpu_percent": 2,
+        "vram_used_bytes": 2399285248,
+        "vram_total_bytes": 12878610432,
+        "temperature_c": 43,
+        "power_w": 37.618
+      },
+      {
+        "at": "20:37:10",
+        "return_codes": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "gpu_percent": 1,
+        "vram_used_bytes": 2399416320,
+        "vram_total_bytes": 12878610432,
+        "temperature_c": 43,
+        "power_w": 37.807
+      }
+    ],
+    "init_code": 0,
+    "handle_code": 0
+  },
+  "codex_readonly_app_server": {
+    "observed_at": "2026-10-15T20:36:14+0800",
+    "initialize_ok": true,
+    "rate_limits": {
+      "codex": {
+        "limitId": "codex",
+        "planType": "plus",
+        "primary": {
+          "usedPercent": 70,
+          "windowDurationMins": 300,
+          "resetsAt": 1792075536
+        },
+        "secondary": {
+          "usedPercent": 11,
+          "windowDurationMins": 10080,
+          "resetsAt": 1792662336
+        }
+      }
+    },
+    "thread_read": {
+      "status": {
+        "type": "notLoaded"
+      },
+      "updatedAt": 1792067773
+    }
+  },
+  "task_events": [
+    {
+      "event_counts": {
+        "thread_settings_applied": 9,
+        "task_started": 6,
+        "item_completed": 194,
+        "token_count": 92,
+        "task_complete": 5
+      },
+      "latest_lifecycle_at": {
+        "task_started": "2026-10-15T12:32:25.862Z",
+        "task_complete": "2026-10-15T12:31:08.263Z"
+      }
+    },
+    {
+      "event_counts": {
+        "thread_settings_applied": 14,
+        "task_started": 11,
+        "item_completed": 322,
+        "token_count": 109,
+        "task_complete": 10,
+        "turn_aborted": 1
+      },
+      "latest_lifecycle_at": {
+        "task_started": "2026-10-15T12:00:37.559Z",
+        "task_complete": "2026-10-15T11:53:18.492Z",
+        "turn_aborted": "2026-10-15T12:00:48.102Z"
+      }
+    }
+  ],
+  "ha_verified_entities": {
+    "sensor.gayso_subscription_remaining": {
+      "state": 127.05,
+      "unit": "GiB",
+      "updated_at": "2026-10-15T12:16:42.860508+00:00"
+    },
+    "sensor.gayso_subscription_updated": {
+      "state": "2026-10-15T12:16:42+00:00"
+    },
+    "sensor.gayso_ad_filter": {
+      "state": "拦截已开启"
+    },
+    "sensor.gayso_anti_ad_count": {
+      "state": 102535
+    },
+    "sensor.gayso_anti_ad_updated": {
+      "state": "2026-10-15T03:28:22+00:00"
+    },
+    "sensor.gayso_dhcp_status": {
+      "state": "运行中",
+      "fresh": true,
+      "age_seconds_at_read": 9,
+      "process_running": true,
+      "udp67_listener": true,
+      "lease_readable": true,
+      "active_leases": 3,
+      "updated_at": "2026-10-15T12:35:00+00:00"
+    },
+    "sensor.gayso_dhcp_active_leases": {
+      "state": 3
+    },
+    "sensor.gayso_dhcp_lease_file_updated": {
+      "state": "2026-10-15T12:29:12+00:00"
+    },
+    "sensor.gayso_dhcp_latest_expiry": {
+      "state": "2026-10-15T12:59:12+00:00"
+    },
+    "sensor.gayso_forwarding_status": {
+      "state": "运行中",
+      "fresh": true,
+      "age_seconds_at_read": 2,
+      "query_ok": true,
+      "chain_installed": true,
+      "hook_installed": true,
+      "ip_forward": true,
+      "tcp_packets": 10463,
+      "tcp_bytes": 570044,
+      "dns_packets": 4577,
+      "dns_bytes": 288949,
+      "tcp_listener": null,
+      "dns_tcp_listener": null,
+      "dns_udp_listener": null,
+      "updated_at": "2026-10-15T12:35:07+00:00"
+    },
+    "binary_sensor.gayso_redir_listener": {
+      "state": "unavailable"
+    },
+    "binary_sensor.gayso_dns_tcp_listener": {
+      "state": "unavailable"
+    },
+    "binary_sensor.gayso_dns_udp_listener": {
+      "state": "unavailable"
+    },
+    "sensor.gayso_mihomo_mode": {
+      "state": "rule",
+      "freshness_not_verified": true
+    },
+    "sensor.gayso_proxy_node_count": {
+      "state": 63,
+      "freshness_not_verified": true
+    },
+    "sensor.gayso_proxy_sampled": {
+      "state": "unavailable",
+      "restored": true
+    },
+    "weather.forecast_wo_de_jia": {
+      "state": "clear-night",
+      "temperature": 25.5,
+      "temperature_unit": "°C",
+      "humidity": 80,
+      "source": "met.no",
+      "last_updated_not_captured": true,
+      "location_matches_guangming_not_verified": true
+    },
+    "sun.sun": {
+      "state": "below_horizon",
+      "next_rising": "2026-10-15T22:21:14.000575+00:00",
+      "next_setting": "2026-10-16T09:58:03.977780+00:00"
+    },
+    "climate.cuco_cn_769323959_cp6": {
+      "state": "off",
+      "target_temperature": 27,
+      "current_temperature": null,
+      "min_temp": 16,
+      "max_temp": 30,
+      "target_temp_step": 1,
+      "supported_features": 393,
+      "hvac_modes": [
+        "cool",
+        "heat",
+        "auto",
+        "fan_only",
+        "dry",
+        "off"
+      ]
+    },
+    "climate.lumi_cn_582865511_mcn02": {
+      "state": "off",
+      "target_temperature": 26,
+      "current_temperature": null,
+      "min_temp": 16,
+      "max_temp": 30,
+      "target_temp_step": 1,
+      "supported_features": 425,
+      "hvac_modes": [
+        "auto",
+        "cool",
+        "dry",
+        "heat",
+        "fan_only",
+        "off"
+      ]
+    }
+  },
+  "ha_frontend_devices": {
+    "lights": [
+      "客厅灯1",
+      "客厅灯2"
+    ],
+    "curtains": [
+      "窗帘左",
+      "窗帘右"
+    ],
+    "controls_executed": false,
+    "light_and_cover_entity_ids_not_captured": true
+  },
+  "rtss": {
+    "installed_version": "7.3.4 Beta 3",
+    "sdk_present": true,
+    "process_running": false,
+    "shared_memory_present": false,
+    "sdk_verified_fields": [
+      "dwProcessID",
+      "szName",
+      "dwFrames",
+      "dwTime0",
+      "dwTime1",
+      "dwFrameTime"
+    ],
+    "fps_live_game_test_done": false,
+    "frame_time_not_render_latency": true
+  },
+  "not_verified": [
+    "CPU temperature",
+    "CPU package power",
+    "live game FPS",
+    "render latency",
+    "HA background token integration",
+    "Mihomo authenticated API",
+    "Docker read adapter",
+    "backlight control",
+    "ESP32-P4/C5 physical network/display path",
+    "NAS-to-BX54 reachability",
+    "BX54 internal measurement cadence"
+  ],
+  "followup_2048": {
+    "user_confirmed": {
+      "FORWARD": "Gayso Forwarding Status / sensor.gayso_forwarding_status",
+      "AntiAD": "mihomo ad filtering rule set; not an independent AdGuard service"
+    },
+    "rtss_wake": {
+      "installed": true,
+      "started": true,
+      "running": true,
+      "shared_memory": true,
+      "error": null,
+      "signature": 1381258067,
+      "memory_version": 131092
+    },
+    "router": {
+      "model": "H3C BX54",
+      "firmware": "BX54EV100R014",
+      "direction_verified_from_firmware_ui": true,
+      "samples": [
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:00.447564+08:00",
+          "upload_Bps": 32241,
+          "download_Bps": 15363,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        },
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:01.434586+08:00",
+          "upload_Bps": 32241,
+          "download_Bps": 15363,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        },
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:02.466991+08:00",
+          "upload_Bps": 32241,
+          "download_Bps": 15363,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        },
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:45.999763+08:00",
+          "upload_Bps": 5216,
+          "download_Bps": 7278,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        },
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:47.014286+08:00",
+          "upload_Bps": 5216,
+          "download_Bps": 7278,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        },
+        {
+          "source": "H3C BX54 WAN",
+          "observed_at": "2026-10-15T20:48:48.017373+08:00",
+          "upload_Bps": 5216,
+          "download_Bps": 7278,
+          "quality": "ok",
+          "transport": "read-only HTTP status page",
+          "source_updated_at": null
+        }
+      ],
+      "collector_integrated_into_ui": false
+    }
+  }
+}

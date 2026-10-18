@@ -1,0 +1,5 @@
+#include "display_brightness.h"
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+int main(int argc,char **argv){assert(argc==2);desk_brightness_start(argv[1]);assert(desk_brightness_state()->automatic&&desk_brightness_state()->manual==80);gso_brightness_manual(desk_brightness_state(),42);assert(desk_brightness_save());desk_brightness_start(argv[1]);assert(!desk_brightness_state()->automatic&&desk_brightness_state()->manual==42);gso_brightness_mode(desk_brightness_state(),true);assert(desk_brightness_save());desk_brightness_start(argv[1]);assert(desk_brightness_state()->automatic&&desk_brightness_state()->manual==42);char path[1024];snprintf(path,sizeof(path),"%s.preferences.json",argv[1]);FILE *f=fopen(path,"wb");assert(f);fputs("{\"automatic\":false,\"manual_percent\":101}",f);fclose(f);desk_brightness_start(argv[1]);assert(desk_brightness_state()->automatic&&desk_brightness_state()->manual==80);remove(path);puts("PASS: preference mode and manual brightness survive restart; invalid preference uses defaults");return 0;}

@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "cpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "disks": []
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "unknown",
+    "quotas": [],
+    "sessions": []
+  },
+  "boot_id": "00000000-0000-4000-8000-000000000001",
+  "seq": 0,
+  "sampled_at": "2026-10-15T14:00:00Z"
+}

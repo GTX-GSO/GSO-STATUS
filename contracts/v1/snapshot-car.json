@@ -1,0 +1,285 @@
+{
+  "schema_version": "1.0",
+  "windows": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "cpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "gpu": {
+      "model": null,
+      "load_percent": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "temperature_c": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "power_w": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_used_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "memory_total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "disks": []
+  },
+  "game": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "process_name": null,
+    "pid": null,
+    "rendering": null,
+    "fps": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "render_latency_ms": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "fps_history": []
+  },
+  "codex": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "state": "unknown",
+    "quotas": [],
+    "sessions": []
+  },
+  "generated_at": "2026-10-17T13:21:00Z",
+  "net": {
+    "wan": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "download_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "upload_bytes_per_second": {
+        "value": null,
+        "reason": "not_configured"
+      }
+    },
+    "services": {
+      "proxy": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "dhcp": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "clash": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      },
+      "antiad": {
+        "source": {
+          "quality": "unconfigured",
+          "observed_at": null,
+          "source_updated_at": null,
+          "age_ms": null,
+          "last_error_code": "not_configured"
+        },
+        "raw_state": null
+      }
+    },
+    "vpn": {
+      "source": {
+        "quality": "unconfigured",
+        "observed_at": null,
+        "source_updated_at": null,
+        "age_ms": null,
+        "last_error_code": "not_configured"
+      },
+      "remaining_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_bytes": {
+        "value": null,
+        "reason": "not_configured"
+      },
+      "total_origin": null
+    },
+    "antiad_rule_count": {
+      "value": null,
+      "reason": "not_configured"
+    },
+    "antiad_rules_updated_at": null
+  },
+  "home": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "entities": []
+  },
+  "weather": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "location": null,
+    "condition": null,
+    "temperature_c": {
+      "value": null,
+      "reason": "not_configured"
+    }
+  },
+  "sun": {
+    "source": {
+      "quality": "unconfigured",
+      "observed_at": null,
+      "source_updated_at": null,
+      "age_ms": null,
+      "last_error_code": "not_configured"
+    },
+    "sunrise_at": null,
+    "sunset_at": null
+  },
+  "alerts": [],
+  "car": {
+    "source": {
+      "quality": "ok",
+      "observed_at": "2026-10-17T13:21:00Z",
+      "source_updated_at": "2026-10-17T13:20:00Z",
+      "age_ms": 1200,
+      "last_error_code": null
+    },
+    "name": "零跑C11",
+    "vehicle_state": "parked",
+    "charge_state": "charging",
+    "lock_state": "locked",
+    "battery_percent": {
+      "value": 76,
+      "reason": null
+    },
+    "range_km": {
+      "value": 403.5,
+      "reason": null
+    },
+    "remaining_charge_minutes": {
+      "value": 95,
+      "reason": null
+    },
+    "cabin_temperature_c": {
+      "value": 28,
+      "reason": null
+    },
+    "odometer_km": {
+      "value": 20610,
+      "reason": null
+    },
+    "week_distance_km": {
+      "value": 132.4,
+      "reason": null
+    },
+    "energy_kwh_per_100km": {
+      "value": 14.8,
+      "reason": null
+    },
+    "tyre_fl_bar": {
+      "value": 2.33,
+      "reason": null
+    },
+    "tyre_fr_bar": {
+      "value": 2.35,
+      "reason": null
+    },
+    "tyre_rl_bar": {
+      "value": 2.31,
+      "reason": null
+    },
+    "tyre_rr_bar": {
+      "value": 2.34,
+      "reason": null
+    },
+    "tyre_alarm": "ok",
+    "windows_state": "closed",
+    "trunk_state": "closed",
+    "charging_power_kw": {
+      "value": 6.8,
+      "reason": null
+    },
+    "updated_at": "2026-10-17T13:20:00+00:00",
+    "lock_entity_id": "lock.ling_pao_c11_che_men_suo",
+    "refresh_entity_id": "button.ling_pao_c11_shua_xin_che_kuang",
+    "actions": [
+      "unlock",
+      "press"
+    ]
+  }
+}

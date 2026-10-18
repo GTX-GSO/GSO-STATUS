@@ -1,0 +1,939 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "windows": {
+      "$ref": "#/$defs/windows"
+    },
+    "game": {
+      "$ref": "#/$defs/game"
+    },
+    "codex": {
+      "$ref": "#/$defs/codex"
+    },
+    "boot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "sampled_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "windows",
+    "game",
+    "codex",
+    "boot_id",
+    "seq",
+    "sampled_at"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gso-status:v1:telemetry",
+  "$defs": {
+    "metric": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "value",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "reason": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        }
+      ]
+    },
+    "bytes": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/metric"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        }
+      ]
+    },
+    "percent": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/metric"
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      ]
+    },
+    "temperature": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -100,
+          "maximum": 200
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "value",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "reason": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "ok",
+            "stale",
+            "offline",
+            "unsupported",
+            "unconfigured",
+            "error"
+          ]
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "source_updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "age_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "last_error_code": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "quality",
+        "observed_at",
+        "source_updated_at",
+        "age_ms",
+        "last_error_code"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "quality": {
+              "enum": [
+                "ok",
+                "stale",
+                "offline"
+              ]
+            },
+            "observed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "age_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        {
+          "properties": {
+            "quality": {
+              "enum": [
+                "unsupported",
+                "unconfigured",
+                "error"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "hardware": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "load_percent": {
+          "$ref": "#/$defs/percent"
+        },
+        "temperature_c": {
+          "$ref": "#/$defs/temperature"
+        },
+        "power_w": {
+          "$ref": "#/$defs/metric"
+        },
+        "memory_used_bytes": {
+          "$ref": "#/$defs/bytes"
+        },
+        "memory_total_bytes": {
+          "$ref": "#/$defs/bytes"
+        },
+        "clock_mhz": {
+          "$ref": "#/$defs/frequency"
+        },
+        "memory_clock_mhz": {
+          "$ref": "#/$defs/frequency"
+        },
+        "memory_rate_mts": {
+          "$ref": "#/$defs/frequency"
+        },
+        "memory_clock_source": {
+          "enum": [
+            null,
+            "sensor",
+            "configured_ddr"
+          ]
+        }
+      },
+      "required": [
+        "model",
+        "load_percent",
+        "temperature_c",
+        "power_w",
+        "memory_used_bytes",
+        "memory_total_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "disk": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "total_bytes": {
+          "$ref": "#/$defs/bytes"
+        },
+        "free_bytes": {
+          "$ref": "#/$defs/bytes"
+        },
+        "busy_percent": {
+          "$ref": "#/$defs/percent"
+        },
+        "read_ms": {
+          "$ref": "#/$defs/metric"
+        },
+        "write_ms": {
+          "$ref": "#/$defs/metric"
+        },
+        "response_ms": {
+          "$ref": "#/$defs/metric"
+        },
+        "read_bytes_per_second": {
+          "$ref": "#/$defs/metric"
+        },
+        "write_bytes_per_second": {
+          "$ref": "#/$defs/metric"
+        }
+      },
+      "required": [
+        "id",
+        "model",
+        "total_bytes",
+        "free_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "windows": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "cpu": {
+          "$ref": "#/$defs/hardware"
+        },
+        "gpu": {
+          "$ref": "#/$defs/hardware"
+        },
+        "disks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/disk"
+          },
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "source",
+        "cpu",
+        "gpu",
+        "disks"
+      ],
+      "additionalProperties": false
+    },
+    "game": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "process_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "pid": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "rendering": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fps": {
+          "$ref": "#/$defs/metric"
+        },
+        "render_latency_ms": {
+          "$ref": "#/$defs/metric"
+        },
+        "fps_history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/metric"
+          },
+          "maxItems": 24
+        },
+        "icon_argb8888": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 3072,
+          "maxLength": 3072,
+          "pattern": "^[A-Za-z0-9+/]+$"
+        }
+      },
+      "required": [
+        "source",
+        "process_name",
+        "pid",
+        "rendering",
+        "fps",
+        "render_latency_ms",
+        "fps_history"
+      ],
+      "additionalProperties": false
+    },
+    "quota": {
+      "type": "object",
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "window_duration_mins": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "remaining_percent": {
+          "$ref": "#/$defs/percent"
+        },
+        "resets_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "bucket",
+        "window_duration_mins",
+        "remaining_percent",
+        "resets_at"
+      ],
+      "additionalProperties": false
+    },
+    "session": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "state": {
+          "enum": [
+            "running",
+            "idle",
+            "unknown"
+          ]
+        },
+        "title_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "started_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "running_duration_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "duration_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "state"
+      ],
+      "additionalProperties": false
+    },
+    "codex": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "idle",
+            "unknown"
+          ]
+        },
+        "quotas": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/quota"
+          },
+          "maxItems": 8
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/session"
+          },
+          "maxItems": 4
+        },
+        "clients": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "enum": [
+                  "codex",
+                  "claude"
+                ]
+              },
+              "online": {
+                "type": "boolean"
+              },
+              "tokens_today": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "id",
+              "online",
+              "tokens_today"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "source",
+        "state",
+        "quotas",
+        "sessions"
+      ],
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "raw_state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        }
+      },
+      "required": [
+        "source",
+        "raw_state"
+      ],
+      "additionalProperties": false
+    },
+    "net": {
+      "type": "object",
+      "properties": {
+        "wan": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "download_bytes_per_second": {
+              "$ref": "#/$defs/metric"
+            },
+            "upload_bytes_per_second": {
+              "$ref": "#/$defs/metric"
+            }
+          },
+          "required": [
+            "source",
+            "download_bytes_per_second",
+            "upload_bytes_per_second"
+          ],
+          "additionalProperties": false
+        },
+        "services": {
+          "type": "object",
+          "properties": {
+            "proxy": {
+              "$ref": "#/$defs/status"
+            },
+            "dhcp": {
+              "$ref": "#/$defs/status"
+            },
+            "clash": {
+              "$ref": "#/$defs/status"
+            },
+            "antiad": {
+              "$ref": "#/$defs/status"
+            }
+          },
+          "required": [
+            "proxy",
+            "dhcp",
+            "clash",
+            "antiad"
+          ],
+          "additionalProperties": false
+        },
+        "vpn": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "remaining_bytes": {
+              "$ref": "#/$defs/bytes"
+            },
+            "total_bytes": {
+              "$ref": "#/$defs/bytes"
+            },
+            "total_origin": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "maxLength": 160
+            }
+          },
+          "required": [
+            "source",
+            "remaining_bytes",
+            "total_bytes",
+            "total_origin"
+          ],
+          "additionalProperties": false
+        },
+        "antiad_rule_count": {
+          "$ref": "#/$defs/bytes"
+        },
+        "antiad_rules_updated_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "wan",
+        "services",
+        "vpn",
+        "antiad_rule_count",
+        "antiad_rules_updated_at"
+      ],
+      "additionalProperties": false
+    },
+    "home_entity": {
+      "type": "object",
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "state": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "current_temperature_c": {
+          "$ref": "#/$defs/temperature"
+        },
+        "target_temperature_c": {
+          "$ref": "#/$defs/temperature"
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "turn_on",
+              "turn_off",
+              "set_temperature",
+              "open_cover",
+              "close_cover",
+              "stop_cover"
+            ]
+          },
+          "maxItems": 6
+        }
+      },
+      "required": [
+        "entity_id",
+        "name",
+        "source",
+        "state",
+        "current_temperature_c",
+        "target_temperature_c",
+        "actions"
+      ],
+      "additionalProperties": false
+    },
+    "home": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/home_entity"
+          },
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "source",
+        "entities"
+      ],
+      "additionalProperties": false
+    },
+    "weather": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "condition": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 160
+        },
+        "temperature_c": {
+          "$ref": "#/$defs/temperature"
+        }
+      },
+      "required": [
+        "source",
+        "location",
+        "condition",
+        "temperature_c"
+      ],
+      "additionalProperties": false
+    },
+    "sun": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "sunrise_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "sunset_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "source",
+        "sunrise_at",
+        "sunset_at"
+      ],
+      "additionalProperties": false
+    },
+    "alert": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ]
+        }
+      },
+      "required": [
+        "code",
+        "source",
+        "severity"
+      ],
+      "additionalProperties": false
+    },
+    "frequency": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "value",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "reason": {
+              "type": "null"
+            }
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        }
+      ]
+    }
+  }
+}

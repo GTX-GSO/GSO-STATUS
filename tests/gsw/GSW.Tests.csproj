@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0-windows</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../gsw/NativeTray.cs" Link="NativeTray.cs" />
+    <Compile Include="../../gsw/CodexTasks.cs" Link="CodexTasks.cs" />
+    <Compile Include="../../gsw/CodexQuota.cs" Link="CodexQuota.cs" />
+    <Compile Include="../../gsw/Model.cs" Link="Model.cs" />
+    <Compile Include="../../gsw/ClaudeTasks.cs" Link="ClaudeTasks.cs" />
+    <Compile Include="../../gsw/ClaudeQuota.cs" Link="ClaudeQuota.cs" />
+    <Compile Include="../../gsw/ClaudeUsage.cs" Link="ClaudeUsage.cs" />
+    <Compile Include="../../gsw/Vibe.cs" Link="Vibe.cs" />
+    <Compile Include="../../gsw/ClientActivity.cs" Link="ClientActivity.cs" />
+    <Compile Include="../../gsw/PresentMon.cs" Link="PresentMon.cs" />
+    <Compile Include="../../gsw/GameIcon.cs" Link="GameIcon.cs" />
+    <Compile Include="../../gsw/RtssGame.cs" Link="RtssGame.cs" />
+    <Compile Include="../../gsw/CpuSensorClient.cs" Link="CpuSensorClient.cs" />
+  </ItemGroup>
+</Project>
