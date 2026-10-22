@@ -11,15 +11,20 @@ sealed class NativeTray
     readonly Task task;
     readonly Func<string> status;
     readonly Action open;
+    readonly Func<bool?>? autostart;
+    readonly Action? toggleAutostart;
     readonly WindowProc procedure;
     readonly string className="GSOStatusTray."+Guid.NewGuid().ToString("N");
     IntPtr window;
     bool iconAdded;
     uint explorerRestart;
-    NativeTray(CancellationTokenSource stop,Task task,Func<string> status,Action open)
-    {this.stop=stop;this.task=task;this.status=status;this.open=open;procedure=Dispatch;}
-    public static void Run(CancellationTokenSource stop,Task task,Func<string> status,Action open)
-        =>new NativeTray(stop,task,status,open).Loop();
+    IntPtr trayIcon;
+    bool ownsIcon;
+    NativeTray(CancellationTokenSource stop,Task task,Func<string> status,Action open,Func<bool?>? autostart,Action? toggleAutostart)
+    {this.stop=stop;this.task=task;this.status=status;this.open=open;this.autostart=autostart;this.toggleAutostart=toggleAutostart;procedure=Dispatch;}
+    /// <param name="autostart">Whether this copy starts at sign-in (null: cannot tell); the menu item is left out when not given.</param>
+    public static void Run(CancellationTokenSource stop,Task task,Func<string> status,Action open,Func<bool?>? autostart=null,Action? toggleAutostart=null)
+        =>new NativeTray(stop,task,status,open,autostart,toggleAutostart).Loop();
     public static void ShowError(string message)=>MessageBoxW(IntPtr.Zero,message,"GSO STATUS WIN",0x10);
     void Loop()
     {
@@ -28,6 +33,11 @@ sealed class NativeTray
         if(RegisterClassW(ref wc)==0)throw new Win32Exception();
         try
         {
+            // The single-file app carries the same icon as Explorer. Load it once,
+            // at the current tray size, and reuse the handle on tooltip updates.
+            trayIcon=LoadImageW(instance,(IntPtr)32512,1,GetSystemMetrics(49),GetSystemMetrics(50),0);
+            ownsIcon=trayIcon!=IntPtr.Zero;
+            if(!ownsIcon)trayIcon=LoadIconW(IntPtr.Zero,(IntPtr)32512);
             explorerRestart=RegisterWindowMessageW("TaskbarCreated");
             window=CreateWindowExW(0,className,"GSO STATUS WIN",0,0,0,0,0,IntPtr.Zero,IntPtr.Zero,instance,IntPtr.Zero);
             if(window==IntPtr.Zero)throw new Win32Exception();
@@ -42,13 +52,14 @@ sealed class NativeTray
             stop.Cancel();
             if(window!=IntPtr.Zero)DestroyWindow(window);
             UnregisterClassW(className,instance);
+            if(ownsIcon){DestroyIcon(trayIcon);trayIcon=IntPtr.Zero;}
             GC.KeepAlive(procedure);
         }
     }
     void UpdateIcon()
     {
         var tip="GSW · "+status();
-        var data=Data();data.Flags=7;data.Callback=Callback;data.Icon=LoadIconW(IntPtr.Zero,(IntPtr)32512);data.Tip=tip[..Math.Min(127,tip.Length)];
+        var data=Data();data.Flags=7;data.Callback=Callback;data.Icon=trayIcon;data.Tip=tip[..Math.Min(127,tip.Length)];
         iconAdded=Shell_NotifyIconW(iconAdded?1u:0u,ref data);
     }
     IconData Data()=>new(){Size=(uint)Marshal.SizeOf<IconData>(),Window=window,Id=1,Tip="",Info="",Title=""};
@@ -78,11 +89,13 @@ sealed class NativeTray
         var menu=CreatePopupMenu();if(menu==IntPtr.Zero)return;
         try
         {
-            AppendMenuW(menu,1,100,status());AppendMenuW(menu,0,101,"打开配置");AppendMenuW(menu,0,102,"退出");
+            AppendMenuW(menu,1,100,status());AppendMenuW(menu,0,101,"打开配置");
+            if(autostart is not null&&toggleAutostart is not null){var on=autostart();AppendMenuW(menu,on is null?1u:on==true?8u:0u,103,"开机自启");}
+            AppendMenuW(menu,0,102,"退出");
             GetCursorPos(out var point);SetForegroundWindow(hwnd);
             var command=TrackPopupMenuEx(menu,0x102,point.X,point.Y,hwnd,IntPtr.Zero);
             PostMessageW(hwnd,0,UIntPtr.Zero,IntPtr.Zero);
-            if(command==101)open();else if(command==102)PostMessageW(hwnd,0x10,UIntPtr.Zero,IntPtr.Zero);
+            if(command==101)open();else if(command==103)toggleAutostart?.Invoke();else if(command==102)PostMessageW(hwnd,0x10,UIntPtr.Zero,IntPtr.Zero);
         }
         finally {DestroyMenu(menu);}
     }
@@ -116,6 +129,9 @@ sealed class NativeTray
     [DllImport("user32")]static extern bool KillTimer(IntPtr hwnd,UIntPtr id);
     [DllImport("user32",CharSet=CharSet.Unicode)]static extern uint RegisterWindowMessageW(string name);
     [DllImport("user32",CharSet=CharSet.Unicode)]static extern IntPtr LoadIconW(IntPtr instance,IntPtr name);
+    [DllImport("user32",CharSet=CharSet.Unicode)]static extern IntPtr LoadImageW(IntPtr instance,IntPtr name,uint type,int width,int height,uint flags);
+    [DllImport("user32")]static extern bool DestroyIcon(IntPtr icon);
+    [DllImport("user32")]static extern int GetSystemMetrics(int index);
     [DllImport("shell32",CharSet=CharSet.Unicode)]static extern bool Shell_NotifyIconW(uint operation,ref IconData data);
     [DllImport("user32")]static extern IntPtr CreatePopupMenu();
     [DllImport("user32",CharSet=CharSet.Unicode)]static extern bool AppendMenuW(IntPtr menu,uint flags,UIntPtr id,string text);

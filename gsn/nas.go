@@ -31,14 +31,11 @@ type NasConfig struct {
 	// Emmc is the block device of the eMMC (/dev/mmcblkN) whose busy percentage and read/write throughput are reported.
 	// Left empty, the first mmcblkN found in /sys/block is used. Only the kernel's counters are read, never the device.
 	Emmc string `json:"emmc,omitempty"`
-	// DiskSleepSeconds is the drive's own idle timeout (60-3600, default 300): without a precise power answer the disk is
-	// taken to fall asleep that long after the last completed request.
+	// Legacy config compatibility only; no sleep state is inferred from an idle timeout.
 	DiskSleepSeconds int `json:"disk_sleep_seconds,omitempty"`
 	// UTCOffsetMinutes sets where "today" starts for the wake counter (default +480, Beijing time).
 	UTCOffsetMinutes *int `json:"utc_offset_minutes,omitempty"`
-	// DiskReadAsleep also reads the temperature while the disk sleeps (or its state is not known). That may wake the drive:
-	// a read that takes two seconds or more, or a drive that answers "active" right after it, counts as a wake-up of our own
-	// making in the day's wake counter, so the counter shows whether the drive can answer from its cache.
+	// Optional SMART reads during standby; only an actual power-state transition counts as a wake.
 	DiskReadAsleep bool `json:"disk_read_asleep,omitempty"`
 }
 
@@ -48,7 +45,7 @@ const (
 	nasOffline     = 45 * time.Second
 	nasDiskEvery   = 600 * time.Second // default SMART interval while the drive is awake
 	nasPowerEvery  = 60 * time.Second  // power-state query interval (does not wake the drive)
-	nasDiskExpires = 30 * time.Minute  // how long the last temperature stays on screen while the disk is idle
+	nasDiskExpires = 2 * time.Hour     // how long the last temperature stays on screen while the disk is idle
 )
 
 var nasDiskPattern = regexp.MustCompile(`^/dev/sd[a-z]$`)
@@ -74,11 +71,20 @@ type nasReading struct {
 }
 
 type NasSource struct {
-	cfg        *NasConfig
-	proc, sys  string
-	power      func(device string) string
-	smart      func(device string) (celsius float64, err error) // temperature only (tests); smartFull is used when nil
-	smartFull  func(device string) (smartReading, error)
+	cfg       *NasConfig
+	proc, sys string
+	power     func(device string) string
+	smart     func(device string) (celsius float64, err error) // temperature only (tests); smartFull is used when nil
+	smartFull func(device string) (smartReading, error)
+	// Sampling owns mutable state, including device I/O. Readers only copy a completed
+	// publication under mu, so a slow device cannot hold the server's snapshot lock.
+	sampleMu sync.Mutex
+	mu       sync.Mutex
+	cached   nasState
+	nasState
+}
+
+type nasState struct {
 	health     *smartHealth // the last SMART table read; these counters change slowly and stay until GSN restarts
 	ioTotal    uint64
 	ioHave     bool
@@ -86,7 +92,6 @@ type NasSource struct {
 	act        blockActivity // the hard disk
 	emmcAct    blockActivity
 	powerState string
-	mu         sync.Mutex
 	prevBusy   uint64
 	prevTotal  uint64
 	havePrev   bool
@@ -98,12 +103,10 @@ type NasSource struct {
 	powerAt    time.Time // when powerState was last learned: an I/O sample or the drive's own answer
 	preciseAt  time.Time // when the drive itself last answered the power query
 	precise    string
-	begin      time.Time
 	awake      bool // the disk is spinning (judged from the drive's answer, else from completed I/O)
 	awakeKnown bool
 	wakes      int // wake-ups on wakeDay
 	wakeDay    int
-	selfWake   time.Time // when our own SMART read woke the disk
 	elapsed    func(time.Time) time.Duration
 	diskRead   time.Time
 	sampledAny bool
@@ -193,11 +196,11 @@ func (s *NasSource) zoneTemperature(words ...string) contracts.Object {
 }
 
 func (s *NasSource) Sample(now time.Time) {
+	s.sampleMu.Lock()
+	defer s.sampleMu.Unlock()
 	var r nasReading
 	r.cpu, r.memory, r.total = missing("source_unavailable"), missing("source_unavailable"), missing("source_unavailable")
 	got := false
-	s.mu.Lock()
-	defer s.mu.Unlock()
 	if text, ok := readText(filepath.Join(s.proc, "stat")); ok {
 		if busy, total, ok := cpuTimes(text); ok {
 			got = true
@@ -227,6 +230,9 @@ func (s *NasSource) Sample(now time.Time) {
 	s.sampledAny = true
 	s.trackEmmc(now)
 	s.sampleDisk(now)
+	s.mu.Lock()
+	s.cached = s.nasState // metric maps are replaced, never modified after publication
+	s.mu.Unlock()
 }
 
 // blockStat is the part of /sys/block/sdX/stat that tells what the disk has done: completed requests, sectors moved
@@ -318,7 +324,7 @@ func (s *NasSource) trackEmmc(now time.Time) {
 	s.emmcAct.update(cur, ok, now)
 }
 
-// Caller holds s.mu. A SMART read is only sent while the disk is certainly spinning: when requests completed since the
+// Caller holds sampleMu, never the publication lock. A SMART read is only sent while the disk is certainly spinning: when requests completed since the
 // last sample (a few seconds ago), or when the drive itself reports an active power state. A sleeping drive, a silent drive
 // and an idle one that nobody asked anything are all left alone.
 func (s *NasSource) sampleDisk(now time.Time) {
@@ -332,16 +338,19 @@ func (s *NasSource) sampleDisk(now time.Time) {
 	}
 	busy := s.ioSeen.Equal(now)
 	due := s.diskRead.IsZero() || now.Sub(s.diskRead) >= interval
-	fresh := busy // the power state is from this very sample
-	if busy {
-		s.powerState, s.powerAt = diskActive, now
-	} else if !s.cfg.DiskIOOnly && (s.powerTried.IsZero() || now.Sub(s.powerTried) >= nasPowerEvery || due) {
+	fresh := false
+	if !s.cfg.DiskIOOnly && (s.powerTried.IsZero() || now.Sub(s.powerTried) >= nasPowerEvery || due || busy) {
 		s.powerTried, fresh = now, true
 		s.powerState, s.powerAt = s.power(s.cfg.Disk), now
 		s.precise, s.preciseAt = s.powerState, now
 	}
+
 	s.trackAwake(now)
 	switch {
+	case s.cfg.DiskIOOnly && busy:
+		if due {
+			s.readTemperature(now, interval)
+		}
 	case s.powerState == diskActive:
 		if !due || !fresh {
 			return
@@ -350,22 +359,15 @@ func (s *NasSource) sampleDisk(now time.Time) {
 	case s.cfg.DiskReadAsleep:
 		// Asleep, or nothing known: read anyway when due, and note whether that woke the drive.
 		if due {
-			asleep := !s.awake
-			took := s.readTemperature(now, interval)
-			woke := asleep && took >= 2*time.Second
+			s.readTemperature(now, interval)
 			if !s.cfg.DiskIOOnly {
 				s.powerTried = now
 				s.powerState, s.powerAt = s.power(s.cfg.Disk), now
 				s.precise, s.preciseAt = s.powerState, now
-				woke = woke || asleep && s.powerState == diskActive
-			}
-			if woke {
-				s.selfWake = now
 			}
 			s.trackAwake(now)
 		}
-	case s.powerState == diskStandby:
-		s.disk, s.diskUntil, s.diskRead = missing("disk_standby"), now.Add(3*nasPowerEvery), time.Time{}
+
 	}
 	// otherwise nothing is known about the drive (or only I/O counters are used and the disk is quiet): the last reading ages
 }
@@ -390,17 +392,10 @@ func (s *NasSource) readTemperature(now time.Time, interval time.Duration) time.
 	}
 	if celsius := reading.celsius; err == nil && reading.hasTemp && celsius >= -40 && celsius <= 150 {
 		s.disk, s.diskUntil = value(round1(celsius)), now.Add(nasDiskExpires)
-	} else {
+	} else if s.disk == nil || now.After(s.diskUntil) {
 		s.disk, s.diskUntil = missing("disk_unavailable"), now.Add(interval)
 	}
 	return took
-}
-
-func (s *NasSource) sleepWindow() time.Duration {
-	if s.cfg.DiskSleepSeconds > 0 {
-		return time.Duration(s.cfg.DiskSleepSeconds) * time.Second
-	}
-	return 300 * time.Second
 }
 
 // today is the date number (yyyymmdd) in the configured offset.
@@ -413,32 +408,13 @@ func (s *NasSource) today(now time.Time) int {
 	return y*10000 + int(m)*100 + d
 }
 
-// trackAwake decides whether the disk is spinning and counts the wake-ups. The drive's own answer (CHECK POWER MODE, which
-// does not wake it) is used while it is fresh, but completed requests within the idle timeout always mean awake. Without a
-// fresh answer the disk is taken to sleep sleepWindow after the last completed request, which is how the
-// drive's own timer works; before that has been seen once the state is unknown. Only a change from asleep to awake counts.
+// Only fresh drive power answers establish state; I/O and elapsed time are not spindle evidence.
 func (s *NasSource) trackAwake(now time.Time) {
-	if s.begin.IsZero() {
-		s.begin = now
-	}
-	window := s.sleepWindow()
-	awake, known := false, true
-	switch {
-	case !s.selfWake.IsZero() && now.Sub(s.selfWake) <= window:
-		awake = true
-	case !s.preciseAt.IsZero() && now.Sub(s.preciseAt) <= 3*nasPowerEvery && s.precise != diskUnknown && s.precise != "":
-		// A drive that says "standby" right after it completed requests is taken as awake: the answer is not trusted over
-		// the kernel's own counters, which cannot be wrong about requests that really reached the disk.
-		awake = s.precise == diskActive || !s.ioSeen.IsZero() && now.Sub(s.ioSeen) <= window
-	case !s.ioSeen.IsZero() && now.Sub(s.ioSeen) <= window:
-		awake = true
-	case !s.ioSeen.IsZero() || now.Sub(s.begin) >= window:
-	default:
-		known = false
-	}
-	if !known {
+	if s.preciseAt.IsZero() || now.Sub(s.preciseAt) > 3*nasPowerEvery || (s.precise != diskActive && s.precise != diskStandby) {
+		s.awakeKnown = false
 		return
 	}
+	awake := s.precise == diskActive
 	if awake && s.awakeKnown && !s.awake {
 		if day := s.today(now); day != s.wakeDay {
 			s.wakeDay, s.wakes = day, 0
@@ -484,13 +460,18 @@ func (s *NasSource) Run(ctx context.Context) {
 }
 
 func (s *NasSource) Snapshot(now time.Time) contracts.Object {
+	s.mu.Lock()
+	view := NasSource{cfg: s.cfg, nasState: s.cached}
+	s.mu.Unlock()
+	return view.snapshot(now)
+}
+
+func (s *NasSource) snapshot(now time.Time) contracts.Object {
 	source := contracts.Object{"quality": "unconfigured", "observed_at": nil, "source_updated_at": nil, "age_ms": nil, "last_error_code": "not_configured"}
 	if s.cfg == nil {
 		return contracts.Object{"source": source, "cpu_percent": missing("not_configured"), "memory_percent": missing("not_configured"), "memory_total_bytes": missing("not_configured"),
 			"soc_temperature_c": missing("not_configured"), "gpu_temperature_c": missing("not_configured"), "disk_temperature_c": missing("not_configured")}
 	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
 	out := contracts.Object{"source": source, "cpu_percent": missing("source_unavailable"), "memory_percent": missing("source_unavailable"), "memory_total_bytes": missing("source_unavailable"),
 		"soc_temperature_c": missing("source_unavailable"), "gpu_temperature_c": missing("source_unavailable"), "disk_temperature_c": missing("not_configured")}
 	switch {

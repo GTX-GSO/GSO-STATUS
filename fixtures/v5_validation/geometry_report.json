@@ -1,0 +1,62 @@
+{
+  "watertight": true,
+  "consistent_winding": true,
+  "manifold_status": "Error.NoError",
+  "connected_solids": 1,
+  "bounds_mm": [
+    [
+      -2.8,
+      -16.28,
+      -65.9
+    ],
+    [
+      162.8,
+      54.0,
+      6.0
+    ]
+  ],
+  "envelope_mm": [
+    165.60000000000002,
+    70.28,
+    71.9
+  ],
+  "volume_mm3": 59331.70408661344,
+  "clamp_v4_minus_v5_mm3": 0.0,
+  "clamp_v5_minus_v4_mm3": 0.0,
+  "panel_interference_mm3": 0.0,
+  "board_interference_mm3": 0.0,
+  "mount_hole_obstruction_mm3": [
+    0.0,
+    0.0
+  ],
+  "frame_opening_obstruction_mm3": 0.0,
+  "frame_opening_boundary_tolerance_mm": 0.001,
+  "right_wall_missing_mm3": 0.0,
+  "board_to_clamp_y_gap_mm": 1.0,
+  "mount_hole_centers_xz_mm": [
+    [
+      3.5,
+      -45.7
+    ],
+    [
+      95.5,
+      -45.7
+    ]
+  ],
+  "mount_hole_pitch_mm": 92.0,
+  "actual_slicer_run": false,
+  "physical_fit_verified": false,
+  "three_mf_openscad_read_back_valid": true,
+  "three_mf_print_bounds_mm": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      165.6,
+      71.9,
+      70.28
+    ]
+  ]
+}

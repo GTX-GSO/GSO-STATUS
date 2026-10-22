@@ -41,7 +41,7 @@ extern "C" {
 // 📡 MIPI DSI 配置
 // ============================================================================
 #define AXS15260_MIPI_LANES     2       // 🔧 MIPI 数据通道数
-#define AXS15260_DCLK_MHZ       48      // 🔧 像素时钟 (DPI Clock) MHz
+#define AXS15260_DCLK_MHZ       60      // 🔧 像素时钟 (DPI Clock) MHz
 #define AXS15260_HSCLK_MBPS     1000     // 🔧 高速时钟 (HS Clock) Mbps
 
 // ============================================================================
@@ -55,7 +55,8 @@ extern "C" {
     {                                               \
         .bus_id = 0,                                \
         .num_data_lanes = AXS15260_MIPI_LANES,      \
-        .phy_clk_src = MIPI_DSI_PHY_CLK_SRC_DEFAULT,\
+        /* MIPI_DSI_PHY_CLK_SRC_DEFAULT 是 v1.x 的 PLL_F20M，在 P4 v3.x 上会 abort()；这个在 v3.x 选 XTAL */ \
+        .phy_clk_src = MIPI_DSI_PHY_PLLREF_CLK_SRC_DEFAULT,\
         .lane_bit_rate_mbps = AXS15260_HSCLK_MBPS,  \
     }
 
@@ -71,14 +72,15 @@ extern "C" {
 
 /**
  * @brief 🔧 AXS15260 452x1280 60Hz DPI 面板配置
- * @param px_format 像素格式 (如 LCD_COLOR_PIXEL_FORMAT_RGB888)
+ * @param px_format 像素格式 (如 LCD_COLOR_FMT_RGB888)，ESP-IDF 6.x 的 in/out_color_format
  */
 #define AXS15260_452_1280_PANEL_60HZ_DPI_CONFIG(px_format)  \
     {                                                       \
         .dpi_clk_src = MIPI_DSI_DPI_CLK_SRC_DEFAULT,        \
         .dpi_clock_freq_mhz = AXS15260_DCLK_MHZ,            \
         .virtual_channel = 0,                               \
-        .pixel_format = px_format,                          \
+        .in_color_format = px_format,                       \
+        .out_color_format = px_format,                      \
         .num_fbs = 1,                                       \
         .video_timing = {                                   \
             .h_size = AXS15260_LCD_H_RES,                   \
@@ -89,9 +91,6 @@ extern "C" {
             .vsync_back_porch = AXS15260_VBP,               \
             .vsync_pulse_width = AXS15260_VSW,              \
             .vsync_front_porch = AXS15260_VFP,              \
-        },                                                  \
-        .flags = {                                          \
-            .use_dma2d = true,                              \
         },                                                  \
     }
 

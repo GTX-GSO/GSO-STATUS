@@ -5,7 +5,14 @@
 #define LV_USE_STDLIB_MALLOC LV_STDLIB_CLIB
 #define LV_USE_STDLIB_STRING LV_STDLIB_CLIB
 #define LV_USE_STDLIB_SPRINTF LV_STDLIB_CLIB
+#ifdef ESP_PLATFORM
+/* P4 has two cores: let a second FreeRTOS draw thread render half of every frame. Low priority keeps Wi-Fi/lwIP ahead of it. */
+#define LV_USE_OS LV_OS_FREERTOS
+#define LV_DRAW_SW_DRAW_UNIT_CNT 2
+#define LV_DRAW_THREAD_PRIO 3
+#else
 #define LV_USE_OS LV_OS_NONE
+#endif
 #define LV_USE_LOG 0
 #define LV_USE_THEME_DEFAULT 0
 #define LV_FONT_MONTSERRAT_14 1

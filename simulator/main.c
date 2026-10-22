@@ -127,12 +127,14 @@ static unsigned collect_segments(lv_obj_t *parent,lv_obj_t **out,unsigned capaci
 }
 static int selftest(void) {
     FILE *f=fopen("selftest.txt","w");if(!f)return 2;
+    setvbuf(f,NULL,_IONBF,0); /* preserve the last completed check if a lifecycle fault aborts the process */
     fprintf(f,"Version: %s\n",GSO_VERSION);
     int pass=1;desk_ui_pause();desk_ui_theme_mode_set(0);pump(100); /* the colour checks below assume the night palette whatever the wall clock says */
     int unavailable=has_label(lv_screen_active(),"未运行")&&!has_label(lv_screen_active(),"Codex")&&!has_label(lv_screen_active(),"Claude")&&has_label(lv_screen_active(),"天气未接入")&&!has_label(lv_screen_active(),"就绪")&&!has_label(lv_screen_active(),"127.21");
     fprintf(f,"Live default has no demo or historical fallback: %s\n",unavailable?"PASS":"FAIL");pass&=unavailable;
     gso_snapshot input;gso_snapshot_empty(&input);input.cpu.load=gso_metric_number(0);input.cpu.clock=gso_metric_number(4300);input.cpu.memory_rate=gso_metric_number(3600);input.cpu.memory_clock=gso_metric_number(1800);input.cpu.memory_clock_configured=true;input.gpu.clock=gso_metric_number(2700);input.gpu.used=gso_metric_number(1.2*1073741824.0);input.gpu.total=gso_metric_number(12.0*1073741824.0);input.gpu.memory_clock=gso_metric_number(10501);input.cpu.used=gso_metric_number(8589934592.0);input.cpu.total=gso_metric_number(17179869184.0);strcpy(input.cpu.model,"TEST CPU");input.windows=(gso_freshness){GSO_OK,true,desk_data_now_ms(),0};
     desk_ui_apply_snapshot(&input);int summary=has_label(lv_screen_active(),"0")&&has_label(lv_screen_active(),"8.0/16.0 GB  3600 MT/s");dump("preview-live-home.bmp");
+    {input.cpu.memory_rate=gso_metric_number(2666);desk_ui_apply_snapshot(&input);pump(80);int own=has_label(lv_screen_active(),"8.0/16.0 GB  2666 MT/s")&&!has_label(lv_screen_active(),"3600 MT/s");input.cpu.memory_rate=gso_metric_missing("test");desk_ui_apply_snapshot(&input);pump(80);own=own&&!find_label_any(lv_screen_active(),"MT/s");input.cpu.memory_rate=gso_metric_number(3600);desk_ui_apply_snapshot(&input);pump(80);fprintf(f,"CPU memory rate follows the collector, no fixed number: %s\n",own?"PASS":"FAIL");pass&=own;}
     click_at(320,165);pump(50);int detail=desk_ui_detail_is_open()&&has_label(lv_screen_active(),"TEST CPU")&&has_label(lv_screen_active(),"8.0/16.0 GB")&&has_label(lv_screen_active(),"3600 MT/s")&&has_label(lv_screen_active(),"-");dump("preview-live-detail.bmp");
     fprintf(f,"Shared snapshot drives summary and detail; real zero survives: %s\n",summary&&detail?"PASS":"FAIL");pass&=summary&&detail;
     desk_ui_close_detail();
@@ -196,7 +198,7 @@ static int selftest(void) {
     click_at(100,160);pump(240);int weather_ok=desk_ui_detail_is_open()&&has_label(lv_screen_active(),"59%")&&has_label(lv_screen_active(),"1016.9 hPa")&&has_label(lv_screen_active(),"12.2 km/h · 东南偏东")&&has_label(lv_screen_active(),"高 31.9°C");dump("preview-weather-detail.bmp");click_at(470,238);pump(120);int hourly_ok=has_label(lv_screen_active(),"30.3°C")&&!has_label(lv_screen_active(),"高 31.9°C");dump("preview-weather-hourly.bmp");lv_obj_t *hours_scroller=lv_obj_get_child(lv_obj_get_child(lv_screen_active(),-1),-1);mouse.x=1120;mouse.y=342;pressed=true;pump(50);for(int step=1;step<=10;step++){mouse.x=1120-step*45;pump(20);}pressed=false;pump(180);hourly_ok=hourly_ok&&lv_obj_get_scroll_x(hours_scroller)>100;weather_ok=weather_ok&&hourly_ok;desk_ui_close_detail();pump(200);desk_ui_detail(10);pump(240);int clocks_ok=has_label(lv_screen_active(),"4300 MHz")&&has_label(lv_screen_active(),"8.0/16.0 GB")&&has_label(lv_screen_active(),"3600 MT/s")&&has_label(lv_screen_active(),"2700 MHz")&&has_label(lv_screen_active(),"1.2/12.0 GB")&&has_label(lv_screen_active(),"10501 MHz");dump("preview-clocks.bmp");desk_ui_close_detail();pump(200);fprintf(f,"Weather details, six forecasts and hardware clocks: %s\n",weather_ok&&clocks_ok?"PASS":"FAIL");pass&=weather_ok&&clocks_ok;
     pump(260);unsigned base_children=lv_obj_get_child_count(lv_screen_active());
     desk_ui_detail(10);pump(40);lv_obj_t *motion_panel=lv_obj_get_child(lv_screen_active(),-1);int ordinary_motion=lv_obj_get_style_translate_x(motion_panel,0)==0&&lv_obj_get_style_translate_x(lv_obj_get_child(motion_panel,0),0)>0;pump(220);ordinary_motion=ordinary_motion&&lv_obj_get_style_translate_x(motion_panel,0)==0;
-    desk_ui_detail(16);pump(40);motion_panel=lv_obj_get_child(lv_screen_active(),-1);int game_motion=lv_obj_get_style_translate_y(motion_panel,0)==0&&lv_obj_get_style_translate_y(lv_obj_get_child(motion_panel,0),0)>0&&desk_ui_animation_cache_bytes()>0;pump(80);dump("preview-game-boot.bmp");pump(460);game_motion=game_motion&&lv_obj_get_style_translate_y(motion_panel,0)==0&&!has_label(motion_panel,"GAME MODE");dump("preview-game-clocks.bmp");lv_obj_t *latency_box=lv_obj_get_child(motion_panel,4),*latency_value=lv_obj_get_child(latency_box,1);int latency_default=has_label(latency_box,"渲染延迟")&&!strcmp(lv_label_get_text(latency_value),"-")&&lv_obj_get_style_text_font(latency_value,0)==&lv_font_montserrat_40;fprintf(f,"Default render latency uses supported ASCII glyph: %s\n",latency_default?"PASS":"FAIL");pass&=latency_default;
+    desk_ui_detail(16);pump(40);motion_panel=lv_obj_get_child(lv_screen_active(),-1);int game_motion=lv_obj_get_style_translate_y(motion_panel,0)==0&&lv_obj_get_style_translate_y(lv_obj_get_child(motion_panel,0),0)>0;pump(80);dump("preview-game-boot.bmp");pump(460);game_motion=game_motion&&lv_obj_get_style_translate_y(motion_panel,0)==0&&!has_label(motion_panel,"GAME MODE");dump("preview-game-clocks.bmp");lv_obj_t *latency_box=lv_obj_get_child(motion_panel,4),*latency_value=lv_obj_get_child(latency_box,1);int latency_default=has_label(latency_box,"渲染延迟")&&!strcmp(lv_label_get_text(latency_value),"-")&&lv_obj_get_style_text_font(latency_value,0)==&lv_font_montserrat_40;fprintf(f,"Default render latency uses supported ASCII glyph: %s\n",latency_default?"PASS":"FAIL");pass&=latency_default;
     desk_ui_close_detail();int returning=!desk_ui_detail_is_open()&&lv_obj_get_child_count(lv_screen_active())==base_children;pump(220);returning=returning&&lv_obj_get_child_count(lv_screen_active())==base_children&&desk_ui_animation_cache_bytes()==0&&desk_ui_animation_cache_peak_bytes()<=2*1024*1024;
     fprintf(f,"Distinct game entry and deferred return cleanup: %s\n",ordinary_motion&&game_motion&&returning?"PASS":"FAIL");pass&=ordinary_motion&&game_motion&&returning;
     strcpy(input.game_process,"cs2.exe");input.game=(gso_freshness){GSO_OK,true,desk_data_now_ms(),0};input.latency=gso_metric_number(0.25);input.fps=gso_metric_number(144);input.game_icon_valid=true;for(int pixel=0;pixel<576;pixel++){input.game_icon[pixel*4]=230;input.game_icon[pixel*4+1]=(uint8_t)(pixel%24*10);input.game_icon[pixel*4+2]=30;input.game_icon[pixel*4+3]=255;}desk_ui_apply_snapshot(&input);desk_ui_game_manual_open();pump(600);
@@ -254,9 +256,9 @@ desk_ui_close_detail();pump(100);
      gss_preview_imu(true,upright);int level_ok=click_label_button("水平仪");pump(200);r=lv_screen_active();
      level_ok=level_ok&&desk_ui_detail_is_open()&&has_label(r,"水平仪")&&has_label(r,"左右倾斜")&&has_label(r,"0.0°")&&has_label(r,"已摆平")&&has_label(r,"x +0.00   y +1.00   z +0.02 g");dump("preview-level-flat.bmp");
      gso_accel clockwise={-sinf(1.5f*degrees)*cosf(8*degrees),cosf(1.5f*degrees)*cosf(8*degrees),sinf(8*degrees)};gss_preview_imu(true,clockwise);desk_ui_detail(19);pump(200);r=lv_screen_active();
-     level_ok=level_ok&&has_label(r,"1.5°")&&has_label(r,"右侧偏低")&&has_label(r,"后仰 8.0°");dump("preview-level-near.bmp");
+     level_ok=level_ok&&has_label(r,"1.5°")&&has_label(r,"右侧偏低")&&has_label(r,"后仰 8.0°");int right_x=desk_ui_test_level_bubble_x();dump("preview-level-near.bmp");
      gso_accel counter={sinf(4*degrees)*cosf(5*degrees),cosf(4*degrees)*cosf(5*degrees),-sinf(5*degrees)};gss_preview_imu(true,counter);desk_ui_detail(19);pump(200);r=lv_screen_active();
-     level_ok=level_ok&&has_label(r,"4.0°")&&has_label(r,"左侧偏低")&&has_label(r,"前倾 5.0°");dump("preview-level-off.bmp");
+     level_ok=level_ok&&has_label(r,"4.0°")&&has_label(r,"左侧偏低")&&has_label(r,"前倾 5.0°");level_ok=level_ok&&right_x>desk_ui_test_level_bubble_x(); /* low side holds the bubble: right low sits right of left low */dump("preview-level-off.bmp");
      gss_preview_imu(true,(gso_accel){0.01f,0.02f,0.999f});desk_ui_detail(19);pump(200);r=lv_screen_active();level_ok=level_ok&&has_label(r,"屏幕接近水平放置，没有左右倾斜可测");
      gss_preview_imu(true,upright);desk_ui_detail(19);pump(200);gss_preview_imu(true,(gso_accel){0.3f,2.2f,0.1f});pump(200);r=lv_screen_active();level_ok=level_ok&&has_label(r,"请保持屏幕不动")&&has_label(r,"0.0°");
      gss_preview_imu(false,upright);desk_ui_detail(19);pump(200);r=lv_screen_active();level_ok=level_ok&&has_label(r,"未检测到加速度传感器")&&!has_label(r,"已摆平");dump("preview-level-nosensor.bmp");
@@ -272,19 +274,22 @@ desk_ui_close_detail();pump(100);
     wifi_ok=wifi_ok&&click_label_button("Open Preview");pump(100);lv_obj_t *field=find_type(lv_screen_active(),&lv_textarea_class);lv_obj_t *check=find_type(lv_screen_active(),&lv_checkbox_class);wifi_ok=wifi_ok&&field&&check&&!strcmp(lv_textarea_get_text(field),"Open Preview")&&lv_obj_has_state(check,LV_STATE_CHECKED);
     wifi_ok=wifi_ok&&click_label_button("连接");pump(600);gss_wifi_radio_status(&ws);wifi_ok=wifi_ok&&ws.connected&&has_label(lv_screen_active(),"已连接 · Open Preview");
     dump("preview-wifi.bmp");wifi_ok=wifi_ok&&click_label_button("断开");gss_wifi_radio_status(&ws);wifi_ok=wifi_ok&&!ws.connected;
+    /* Reopening with a saved network fills the SSID field while the password field is not built yet. */click_label_button("返回");pump(250);click_at(184,40);pump(300);wifi_ok=wifi_ok&&has_label(lv_screen_active(),"设置 · Wi-Fi")&&find_type(lv_screen_active(),&lv_textarea_class)&&!strcmp(lv_textarea_get_text(find_type(lv_screen_active(),&lv_textarea_class)),"Open Preview");
     wifi_ok=wifi_ok&&click_label_button("忘记")&&!gss_wifi_ssid()[0];pump(100);
+    /* Tapping a field must bring up the keyboard fully on screen (it defaults to bottom-centre alignment). */
+    {lv_obj_t *kb=find_type(lv_screen_active(),&lv_keyboard_class);lv_obj_t *pw=find_type(lv_screen_active(),&lv_textarea_class);lv_area_t ta,ka;lv_obj_get_coords(pw,&ta);click_at((ta.x1+ta.x2)/2,(ta.y1+ta.y2)/2);pump(150);lv_obj_get_coords(kb,&ka);dump("preview-wifi-keyboard.bmp");wifi_ok=wifi_ok&&kb&&!lv_obj_has_flag(kb,LV_OBJ_FLAG_HIDDEN)&&ka.x1>=ta.x1&&ka.x2<=ta.x2&&ka.y1>ta.y2&&ka.y2<=lv_display_get_vertical_resolution(NULL)&&lv_keyboard_get_textarea(kb)==pw;}
     wifi_ok=wifi_ok&&click_label_button("返回");pump(250);wifi_ok=wifi_ok&&!desk_ui_detail_is_open();
     /* The sidebar icon opens the Wi-Fi page directly and back goes to the main page. */
     click_at(184,40);pump(220);wifi_ok=wifi_ok&&has_label(lv_screen_active(),"设置 · Wi-Fi");click_label_button("返回");pump(250);wifi_ok=wifi_ok&&!desk_ui_detail_is_open();
     for(int n=0;n<5;n++){click_at(100,400);pump(180);click_at(184,40);pump(180);wifi_ok=wifi_ok&&has_label(lv_screen_active(),"设置 · Wi-Fi");desk_ui_close_detail();pump(180);}
-    fprintf(f,"Shared Wi-Fi UI, preview scan/select/connect/disconnect/forget, back navigation and lifecycle: %s\n",wifi_ok?"PASS":"FAIL");pass&=wifi_ok;
+    fprintf(f,"Shared Wi-Fi UI, preview scan/select/connect/disconnect/forget, keyboard shown by tapping a field, back navigation and lifecycle: %s\n",wifi_ok?"PASS":"FAIL");pass&=wifi_ok;
     {gso_snapshot vibe=input;vibe.windows=(gso_freshness){GSO_OK,true,desk_data_now_ms(),0};vibe.codex=vibe.windows;vibe.clients[GSO_VIBE_CODEX]=(gso_client){true,false,gso_metric_missing("tokens_unavailable")};vibe.clients[GSO_VIBE_CLAUDE]=(gso_client){true,true,gso_metric_number(1250000)};time_t now=time(NULL);
      strcpy(vibe.task_state,"running");strcpy(vibe.task_title,"VIBE接入Claude");vibe.task_duration_ms=gso_metric_number(1800000);vibe.task_started_at=(int64_t)now-1800;vibe.task_provider=vibe.vibe_provider=GSO_VIBE_CLAUDE;
      vibe.quota_remaining[GSO_VIBE_CODEX][0]=gso_metric_number(67);vibe.quota_remaining[GSO_VIBE_CODEX][1]=gso_metric_number(95);vibe.quota_resets[GSO_VIBE_CODEX][0]=(int64_t)now+7200;vibe.quota_resets[GSO_VIBE_CODEX][1]=(int64_t)now+4*86400;
      vibe.quota_remaining[GSO_VIBE_CLAUDE][0]=gso_metric_number(76.4);vibe.quota_resets[GSO_VIBE_CLAUDE][0]=(int64_t)now+9000;vibe.quota_remaining[GSO_VIBE_CLAUDE][1]=gso_metric_missing("source_unavailable");vibe.quota_resets[GSO_VIBE_CLAUDE][1]=(int64_t)now+5*86400;
      desk_ui_page(0);desk_ui_apply_snapshot(&vibe);pump(120);lv_obj_t *s0=lv_screen_active();
      int vibe_card=has_label(s0,"运行中")&&has_label(s0,"VIBE接入Claude")&&has_label(s0,"Claude")&&has_label(s0,"76%")&&has_label(s0,"-")&&has_label(s0,"已进行 30分钟");dump("preview-vibe-claude-card.bmp");
-     {const double spans[]={45000,59000,3723000,7200000,86400000};const char *texts[]={"已进行 45秒","已进行 59秒","已进行 1小时2分钟","已进行 2小时","已进行 24小时"};for(int k=0;k<5;k++){vibe.task_duration_ms=gso_metric_number(spans[k]);desk_ui_apply_snapshot(&vibe);pump(40);vibe_card=vibe_card&&has_label(lv_screen_active(),texts[k]);}vibe.task_duration_ms=gso_metric_number(1800000);desk_ui_apply_snapshot(&vibe);pump(40);}
+     {const double spans[]={45000,59000,3723000,7200000,86400000};const char *texts[]={"已进行 45秒","已进行 59秒","已进行 1小时2分钟","已进行 2小时","已进行 24小时"};for(size_t k=0;k<sizeof(spans)/sizeof(spans[0]);k++){vibe.task_duration_ms=gso_metric_number(spans[k]);desk_ui_apply_snapshot(&vibe);pump(40);vibe_card=vibe_card&&has_label(lv_screen_active(),texts[k]);}vibe.task_duration_ms=gso_metric_number(1800000);desk_ui_apply_snapshot(&vibe);pump(40);}
      desk_ui_detail(5);pump(240);lv_obj_t *vp=lv_obj_get_child(lv_screen_active(),-1);
      int vibe_detail=has_label(vp,"Codex · 5 小时剩余")&&has_label(vp,"Codex · 每周剩余")&&has_label(vp,"Claude · 5 小时剩余")&&has_label(vp,"Claude · 每周剩余")&&has_label(vp,"67%")&&has_label(vp,"95%")&&has_label(vp,"76%")&&has_label(vp,"VIBE接入Claude")&&has_label(vp,"Claude")&&has_label(vp,"在线")&&has_label(vp,"离线")&&has_label(vp,"今日消耗 1.25M tokens")&&has_label(vp,"今日消耗 统计中");dump("preview-vibe-claude-detail.bmp");desk_ui_close_detail();pump(220);
      strcpy(vibe.task_state,"idle");vibe.task_title[0]=0;vibe.task_duration_ms=gso_metric_missing("not_running");for(int w=0;w<2;w++)vibe.quota_remaining[GSO_VIBE_CODEX][w]=gso_metric_missing("source_unavailable");desk_ui_apply_snapshot(&vibe);pump(80);s0=lv_screen_active();
@@ -407,13 +412,60 @@ desk_ui_close_detail();pump(100);
      int ok=frozen>=3&&during_drag>=3&&turned&&live_hidden&&back&&differing<tolerance&&restored<tolerance&&desk_ui_animation_cache_bytes()==0;
      fprintf(f,"Card strip freeze: visible cards replaced by PSRAM snapshots (frame matches the live cards) and restored after the drag, snapshot of %u cards took %llu ms here, real drag froze %u, turned exactly one page, never past the last page and fell back on a tiny drag: %s\n",frozen,(unsigned long long)freeze_ms,during_drag,ok?"PASS":"FAIL");
      if(!ok)fprintf(f,"  page_after=%d frozen_after=%u drag=%u turned=%d frozen=%u hidden=%d back=%d differing=%zu restored=%zu cache=%u\n",page_after,frozen_after,during_drag,turned,frozen,live_hidden,back,differing,restored,(unsigned)desk_ui_animation_cache_bytes());pass&=ok;}
+    /* Pressing a control on a card (NET's Clash switch here; buttons, sliders and switches alike) must not slide the strip:
+       those widgets scroll themselves into view when focused, and without a focus group a press focuses them, so the strip
+       snapped their card to its left edge. */
+    {desk_ui_page(0);pump(150);int before=desk_ui_strip_scroll_x(),held=-1,after=-1;lv_obj_t *mode=find_label_object(lv_screen_active(),"全局模式");
+     if(mode){lv_obj_update_layout(lv_screen_active());lv_area_t a;lv_obj_get_coords(mode,&a);mouse.x=(a.x1+a.x2)/2;mouse.y=(a.y1+a.y2)/2;pressed=true;pump(250);held=desk_ui_strip_scroll_x();pressed=false;pump(300);after=desk_ui_strip_scroll_x();}
+     int ok=before==0&&held==0&&after==0;
+     fprintf(f,"Pressing the Clash switch on a card keeps the strip in place: %s\n",ok?"PASS":"FAIL");
+     if(!ok)fprintf(f,"  before=%d held=%d after=%d found=%d\n",before,held,after,mode!=NULL);
+     desk_ui_page(0);pump(100);pass&=ok;}
+    {gso_snapshot k=input;uint64_t stamp=desk_data_now_ms();k.received_ms=stamp;k.windows=(gso_freshness){GSO_OK,true,stamp,0};k.codex=k.windows;
+     k.print.reported=false;k.printer=(gso_freshness){GSO_UNCONFIGURED,false,0,0};k.car.reported=false;k.car_source=k.printer;k.nas.reported=false;k.nas_source=k.printer;
+     k.cpu.load=gso_metric_number(13);desk_data_test_snapshot(&k);desk_ui_page(0);desk_ui_apply_snapshot(&k);pump(100);
+     desk_ui_test_strip_freeze(0);unsigned frozen=desk_ui_strip_frozen_cards();
+     k.cpu.load=gso_metric_number(87);desk_data_test_snapshot(&k);desk_ui_apply_snapshot(&k);desk_ui_pause();pump(180);
+     lv_obj_t *win=find_label_any(lv_screen_active(),"WIN");lv_obj_t *wc=win?lv_obj_get_parent(win):NULL;
+     int held=frozen>=3&&wc&&has_label(wc,"13")&&!has_label(wc,"87");
+     desk_ui_test_strip_thaw();pump(150);win=find_label_any(lv_screen_active(),"WIN");wc=win?lv_obj_get_parent(win):NULL;
+     int latest=wc&&has_label(wc,"87")&&!desk_ui_animation_cache_bytes();desk_ui_pause();
+     int fallback=1;
+     for(int n=0;n<12;n++){
+      desk_ui_test_cache_limit(n%2?600000:0);desk_ui_test_strip_freeze(0);
+      unsigned cards=desk_ui_strip_frozen_cards();uint32_t bytes=desk_ui_animation_cache_bytes();
+      fallback=fallback&&(n%2?cards==1&&bytes<=600000:cards==0&&bytes==0&&has_label(lv_screen_active(),"WIN"));
+      desk_ui_test_strip_thaw();fallback=fallback&&!desk_ui_animation_cache_bytes()&&has_label(lv_screen_active(),"WIN");
+     }
+     desk_ui_test_cache_limit(3u*1024u*1024u);
+     desk_ui_test_strip_freeze(0);desk_ui_theme_mode_set(1);pump(70);
+     int themes=!desk_ui_animation_cache_bytes()&&!desk_ui_strip_frozen_cards()&&has_label(lv_screen_active(),"WIN");
+     desk_ui_detail(16);pump(30);desk_ui_theme_mode_set(0);pump(70);themes=themes&&!desk_ui_animation_cache_bytes();desk_ui_close_detail();
+     unsigned children=lv_obj_get_child_count(lv_screen_active());int released=1;
+     for(int n=0;n<20;n++){desk_ui_detail(16);desk_ui_close_detail();released=released&&!desk_ui_animation_cache_bytes()&&lv_obj_get_child_count(lv_screen_active())==children;}
+     k.print.reported=true;k.print.state=GSO_PRINT_IDLE;k.printer=(gso_freshness){GSO_OK,true,desk_data_now_ms(),0};k.car.reported=true;k.car_source=k.printer;k.nas.reported=true;k.nas_source=k.printer;
+     desk_data_test_snapshot(&k);desk_ui_apply_snapshot(&k);desk_ui_page(1);pump(100);mouse.x=900;mouse.y=60;pressed=true;pump(60);
+     for(int x=900;x>=650;x-=50){mouse.x=x;pump(30);}unsigned both=desk_ui_strip_frozen_cards();pump(1100);
+     int long_hold=both>=4&&desk_ui_strip_frozen_cards()==both;
+     for(int x=650;x<=940;x+=40){mouse.x=x;pump(30);}pressed=false;pump(650);
+     int reversed=desk_ui_current_page()==1&&desk_ui_strip_scroll_x()==350&&!desk_ui_animation_cache_bytes();
+     desk_ui_page(0);pump(100);mouse.x=950;pressed=true;pump(60);
+     for(int x=950;x>=610;x-=40){mouse.x=x;pump(25);}pressed=false;pump(35);mouse.x=800;pressed=true;pump(100);
+     int interrupted=!desk_ui_animation_cache_bytes();pressed=false;pump(60);
+     mouse.x=950;pressed=true;pump(60);for(int x=950;x>=150;x-=50){mouse.x=x;pump(25);}pressed=false;pump(650);
+     int sx=desk_ui_strip_scroll_x();interrupted=interrupted&&sx>=0&&sx<=1400&&sx%350==0&&!desk_ui_animation_cache_bytes();
+     desk_ui_page(0);desk_ui_apply_snapshot(&input);pump(100);
+     int ok=held&&latest&&fallback&&themes&&released&&long_hold&&reversed&&interrupted;
+     fprintf(f,"Snapshot boundaries: telemetry held until thaw, latest frame restored, zero/partial allocation fallback, theme cancels strip/boot pixels, 20 interrupted boot releases, held/reversed drag, tap-interrupted snap and next drag: %s\n",ok?"PASS":"FAIL");
+     if(!ok)fprintf(f,"  held=%d latest=%d fallback=%d themes=%d released=%d long_hold=%d both=%u reversed=%d interrupted=%d scroll=%d\n",held,latest,fallback,themes,released,long_hold,both,reversed,interrupted,sx);pass&=ok;
+    }
     fprintf(f,"Overall: %s\n",pass?"PASS":"FAIL");fclose(f);return pass?0:3;
 }
 
 /* --perf-probe: how much of the screen each kind of interaction repaints. Pixels are architecture independent, so they
    carry over to the P4 renderer; milliseconds are only this PC's software renderer and are for relative comparison. */
 typedef struct {const char *name;unsigned frames,drawn;uint64_t pixels,max_pixels;double ms,max_ms;} perf_row;
-static perf_row perf_rows[24];
+static perf_row perf_rows[48];
 static unsigned perf_count;
 static perf_row *perf_open(const char *name){perf_row *r=&perf_rows[perf_count++];memset(r,0,sizeof(*r));r->name=name;return r;}
 static void perf_frame(perf_row *r){
@@ -468,8 +520,8 @@ static int perf_probe(void){
      mouse.x=500;mouse.y=200;pressed=true;perf_frame(b);
      for(int i=0;i<24;i++){mouse.x+=16;perf_frame(b);}
      pressed=false;perf_row *t2=perf_open("release and momentum (back)");for(int i=0;i<40;i++)perf_frame(t2);}
-    const int ids[]={10,5,11,15,16};const char *names[]={"open WIN detail","open VIBE detail","open NET detail","open HOME detail","open GAME detail"};
-    for(int k=0;k<5;k++){
+    const int ids[]={10,5,11,15,16,18,20,21,22};const char *names[]={"open WIN detail","open VIBE detail","open NET detail","open HOME detail","open GAME detail","open PRINT detail","open CAR detail","open NAS detail","open HEALTH detail"};
+    for(size_t k=0;k<sizeof(ids)/sizeof(ids[0]);k++){
         perf_row *r=perf_open(names[k]);desk_ui_detail(ids[k]);
         for(int i=0;i<30;i++)perf_frame(r);
         fprintf(f,"objects %s=%u\n",names[k],count_objects(lv_screen_active()));
@@ -506,7 +558,7 @@ int main(int argc,char **argv) {
 #endif
 #ifdef GSO_TEST
     if(argc>1&&!strcmp(argv[1],"--perf-probe"))return perf_probe();
-    if(argc>1&&!strcmp(argv[1],"--clash-switch-test")){pump(1200);bool ok=true;const char *modes[]={"rule","global","direct"};const int order[]={1,2,0};for(int view=0;ok&&view<2;view++){if(view==0)desk_ui_detail(11);else desk_ui_close_detail();pump(250);lv_obj_t *switches[3];lv_obj_t *parent=view==0?lv_obj_get_child(lv_screen_active(),-1):lv_screen_active();ok=collect_segments(parent,switches,3)==3;for(int step=0;ok&&step<3;step++){int target=order[step];lv_obj_update_layout(switches[target]);lv_area_t a;lv_obj_get_coords(switches[target],&a);click_at((a.x1+a.x2)/2,(a.y1+a.y2)/2);desk_clash_result r={0};for(int wait=0;wait<80;wait++){pump(50);r=desk_clash_latest();if(!r.busy&&r.state==CLASH_CONFIRMED&&!strcmp(r.mode,modes[target]))break;}pump(1100);ok=desk_ui_current_page()==0&&desk_ui_detail_is_open()==(view==0)&&!r.busy&&r.state==CLASH_CONFIRMED&&!strcmp(r.mode,modes[target]);for(int j=0;j<3;j++)ok=ok&&(lv_obj_has_state(switches[j],LV_STATE_CHECKED)==(j==target));}}desk_data_stop();lv_deinit();return ok?0:3;}
+    if(argc>1&&!strcmp(argv[1],"--clash-switch-test")){pump(1200);bool ok=true;const char *modes[]={"rule","global","direct"};const int order[]={1,2,0};int slot=desk_ui_card_slot(2),expected=0;for(int view=0;ok&&view<2;view++){if(view==0)desk_ui_detail(11);else{desk_ui_close_detail();expected=slot>0?slot-1:0;desk_ui_page(expected);expected=desk_ui_current_page();}pump(250);lv_obj_t *switches[3];lv_obj_t *parent=view==0?lv_obj_get_child(lv_screen_active(),-1):lv_screen_active();ok=collect_segments(parent,switches,3)==3;for(int step=0;ok&&step<3;step++){int target=order[step];lv_obj_update_layout(switches[target]);lv_area_t a;lv_obj_get_coords(switches[target],&a);click_at((a.x1+a.x2)/2,(a.y1+a.y2)/2);desk_clash_result r={0};for(int wait=0;wait<80;wait++){pump(50);r=desk_clash_latest();if(!r.busy&&r.state==CLASH_CONFIRMED&&!strcmp(r.mode,modes[target]))break;}pump(1100);ok=desk_ui_current_page()==expected&&desk_ui_strip_scroll_x()==expected*350&&desk_ui_detail_is_open()==(view==0)&&!r.busy&&r.state==CLASH_CONFIRMED&&!strcmp(r.mode,modes[target]);for(int j=0;j<3;j++)ok=ok&&(lv_obj_has_state(switches[j],LV_STATE_CHECKED)==(j==target));}}desk_data_stop();lv_deinit();return ok?0:3;}
     if(argc>1&&!strcmp(argv[1],"--clash-current-test")){pump(1500);desk_clash_result before=desk_clash_latest();if(!before.mode[0]||!desk_clash_mode(before.mode)){desk_data_stop();return 3;}desk_clash_result after={0};for(int i=0;i<100;i++){pump(50);after=desk_clash_latest();if(!after.busy&&after.state==CLASH_CONFIRMED&&after.observed_ms>before.observed_ms)break;}bool ok=after.state==CLASH_CONFIRMED&&!after.busy&&after.observed_ms>before.observed_ms&&!strcmp(before.mode,after.mode);desk_data_stop();lv_deinit();return ok?0:3;}
     if(argc>1&&!strcmp(argv[1],"--source-status-test")){pump(1800);int status=(int)desk_data_status();desk_data_stop();lv_deinit();return 20+status;}
     if(argc>1&&!strcmp(argv[1],"--home-cover-test")){pump(1800);if(!desk_home_test_isolated()){desk_data_stop();lv_deinit();return 4;}desk_ui_detail(15);pump(250);int ox=0,oy=0,cx=0,cy=0;int clicked=desk_ui_home_cover_center(0,&ox,&oy)&&desk_ui_home_cover_center(1,&cx,&cy);if(clicked){click_at(ox,oy);pump(150);clicked=desk_ui_home_cover_center(1,&cx,&cy);if(clicked)click_at(cx,cy);}desk_home_result result={0};for(int wait_ms=0;wait_ms<6000;wait_ms+=50){pump(50);result=desk_home_latest();if(result.state==DESK_HOME_CONFIRMED&&!result.busy)break;}int ok=clicked&&result.state==DESK_HOME_CONFIRMED&&result.action==GSO_HOME_CLOSE&&!result.busy;if(!ok)fprintf(stderr,"Cover gesture: clicked=%d state=%d action=%u busy=%d\n",clicked,result.state,result.action,result.busy);desk_data_stop();lv_deinit();return ok?0:3;}

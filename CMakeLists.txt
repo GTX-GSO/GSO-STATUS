@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(PROJECT_VER "0.7.23")
+set(PROJECT_VER "1.0.0")
 set(SDKCONFIG_DEFAULTS "config/gss-hosted-reference.defaults")
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(gso_status_screen)

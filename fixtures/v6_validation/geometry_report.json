@@ -1,0 +1,82 @@
+{
+  "screen_envelope_mm": [
+    160,
+    59.3,
+    6.8
+  ],
+  "screen_opening_mm": [
+    161,
+    60.3
+  ],
+  "panel_pocket_depth_mm": 7.2,
+  "frame_total_depth_mm": 10.2,
+  "glue_gap_behind_panel_mm": 0.2,
+  "watertight": true,
+  "consistent_winding": true,
+  "connected_solids": 1,
+  "bounds_mm": [
+    [
+      -2.8,
+      -22.91,
+      -65.9
+    ],
+    [
+      162.8,
+      54.0,
+      6.0
+    ]
+  ],
+  "volume_mm3": 66221.19776936686,
+  "clamp_v4_minus_v6_mm3": 0.0,
+  "clamp_v6_minus_v4_mm3": 0.0,
+  "panel_interference_mm3": 0.0,
+  "board_interference_mm3": 0.0,
+  "mount_hole_obstruction_mm3": [
+    0.0,
+    0.0
+  ],
+  "nut_pocket_obstruction_mm3": [
+    0.0,
+    0.0
+  ],
+  "frame_opening_obstruction_mm3": 0.0,
+  "right_wall_missing_mm3": 0.0,
+  "unexpected_change_outside_requested_regions_mm3": 0.0,
+  "hole_shift_x_mm_screen_front_view": -1,
+  "mount_hole_centers_xz_mm": [
+    [
+      2.5,
+      -45.7
+    ],
+    [
+      94.5,
+      -45.7
+    ]
+  ],
+  "mount_hole_pitch_mm": 92,
+  "upper_pad_centers_xz_mm": [
+    [
+      3.5,
+      -7.3
+    ],
+    [
+      95.5,
+      -7.3
+    ]
+  ],
+  "upright_readback_watertight": true,
+  "upright_bounds_mm": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      71.9,
+      76.91,
+      165.6
+    ]
+  ],
+  "actual_slicer_run": false,
+  "physical_fit_verified": false
+}

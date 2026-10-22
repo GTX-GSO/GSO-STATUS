@@ -14,5 +14,6 @@
     <Compile Include="../../gsw/GameIcon.cs" Link="GameIcon.cs" />
     <Compile Include="../../gsw/RtssGame.cs" Link="RtssGame.cs" />
     <Compile Include="../../gsw/CpuSensorClient.cs" Link="CpuSensorClient.cs" />
+    <Compile Include="../../gsw/Autostart.cs" Link="Autostart.cs" />
   </ItemGroup>
 </Project>

@@ -51,6 +51,8 @@ static class Program
             try{return ClaudeQuota.RunStatusLine(input,output,bridge);}catch(IOException){return 0;}
         }
         var configPath=Path.GetFullPath(Option("--config",Path.Combine(AppContext.BaseDirectory,"gsw.json")));
+        var autostart=new Autostart();var executable=Environment.ProcessPath??"";
+        if(args.Contains("--disable-autostart")){try{autostart.Disable();return 0;}catch(Exception ex){Log("autostart_error:"+ex.GetType().Name);return 1;}}
         try
         {
             var config=JsonSerializer.Deserialize<Config>(File.ReadAllText(configPath),new JsonSerializerOptions { UnmappedMemberHandling=System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow }) ?? throw new InvalidDataException("配置为空");
@@ -59,6 +61,8 @@ static class Program
             if(config.ClaudeProjectDirectories.Length>8||config.ClaudeProjectDirectories.Any(d=>d.Length is 0 or >260||!Path.IsPathFullyQualified(d))||(config.ClaudeRateLimitsFile!=""&&(config.ClaudeRateLimitsFile.Length>260||!Path.IsPathFullyQualified(config.ClaudeRateLimitsFile))))throw new InvalidDataException("Claude目录与额度文件必须是最多8个完整路径");
             if(config.ExcludedGameExecutables.Length>64||config.ExcludedGameExecutables.Any(n=>n.Length>160||Path.GetFileName(n)!=n))throw new InvalidDataException("排除列表必须是最多64个可执行文件名");
             if (!Uri.TryCreate(config.SnapshotBaseUrl,UriKind.Absolute,out var uri)||uri.Scheme is not ("http" or "https")||uri.UserInfo!=""||uri.Query!=""||uri.Fragment!=""||uri.AbsolutePath!="/") throw new InvalidDataException("SnapshotBaseUrl必须是HTTP(S)服务根地址");
+            // Only a configuration that loads is worth starting at sign-in.
+            if(args.Contains("--enable-autostart")){autostart.Enable(executable,configPath);return 0;}
             using var stopEvent=new EventWaitHandle(false,EventResetMode.ManualReset,@"Local\GSOStatusGSW.Stop."+config.AgentId);
             if(args.Contains("--stop")){stopEvent.Set();return 0;}
             using var mutex=new Mutex(true,@"Local\GSOStatusGSW.Run."+config.AgentId,out var ownsMutex);
@@ -68,11 +72,13 @@ static class Program
             try
             {
                 var task=Run(config,Stop.Token);
+                bool? AutostartOn(){try{return autostart.Read(executable,configPath)==Autostart.State.On;}catch(Exception ex){Log("autostart_error:"+ex.GetType().Name);return null;}}
+                void ToggleAutostart(){try{if(AutostartOn()==true)autostart.Disable();else autostart.Enable(executable,configPath);Log(AutostartOn()==true?"autostart_on":"autostart_off");}catch(Exception ex){Log("autostart_error:"+ex.GetType().Name);}}
                 try { NativeTray.Run(Stop,task,()=>Status,()=>
                 {
                     try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(configPath){UseShellExecute=true}); }
                     catch(Exception ex){Log("open_config_error:"+ex.GetType().Name);}
-                }); }
+                },AutostartOn,ToggleAutostart); }
                 finally { Stop.Cancel();task.GetAwaiter().GetResult(); }
                 return 0;
             }

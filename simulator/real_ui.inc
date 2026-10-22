@@ -57,6 +57,8 @@ static gso_snapshot model;
 /* Defer telemetry widgets, never LVGL's input/animation/display processing. */
 static uint32_t transition_started,transition_duration;
 static bool telemetry_pending;
+static bool strip_frozen;
+static lv_obj_t *game_boot_panel;
 static void interaction_hold(uint32_t duration){
  transition_started=lv_tick_get();transition_duration=duration;
 }
@@ -64,6 +66,7 @@ static bool interaction_busy(void){
 #ifdef GSO_GSS_BASELINE
  return false;
 #else
+ if(strip_frozen)return true; /* includes snapping after the pointer was released */
  if(lv_tick_elaps(transition_started)<transition_duration)return true;
  for(lv_indev_t *input=lv_indev_get_next(NULL);input;input=lv_indev_get_next(input)){
   if(lv_indev_get_state(input)==LV_INDEV_STATE_PRESSED||lv_indev_get_scroll_obj(input))return true;
@@ -461,7 +464,7 @@ static void render_hardware(hardware_view *v,const gso_hardware *h){
   char capacity[40],rate[24];rate[0]=0;
   if(h->used.valid&&h->total.valid)snprintf(capacity,sizeof(capacity),"%.1f/%.1f GB",h->used.value/1073741824.0,h->total.value/1073741824.0);
   else snprintf(capacity,sizeof(capacity),"—/— GB");
-  if(h==&model.cpu)snprintf(rate,sizeof(rate),"3600 MT/s");
+  if(h->memory_rate.valid)snprintf(rate,sizeof(rate),"%.0f MT/s",h->memory_rate.value); /* what the collector reports, never a fixed number */
   else if(h->memory_clock.valid)snprintf(rate,sizeof(rate),"%.0f MHz",h->memory_clock.value);
   if(v->memory_rate){lv_label_set_text(v->memory,capacity);lv_label_set_text(v->memory_rate,rate);}
   else{
@@ -750,7 +753,7 @@ static void render(void){
   }
  }
 }
-void desk_ui_apply_snapshot(const gso_snapshot *snapshot){if(snapshot){model=*snapshot;render();}}
+void desk_ui_apply_snapshot(const gso_snapshot *snapshot){if(snapshot){model=*snapshot;if(strip_frozen)telemetry_pending=true;else render();}}
 static void hardware_gauge(lv_obj_t *p,int x,int y,int size,hardware_view *v,const char *name,uint32_t color){
  lv_obj_t *frame=box(p,x,y,size,(size*86+99)/100,0,0);
  lv_obj_set_style_bg_opa(frame,LV_OPA_TRANSP,0);
@@ -967,22 +970,37 @@ if(side_button)lv_label_set_text(lv_obj_get_child(side_button,0),"设置");
 bool desk_ui_detail_is_open(void){return overlay!=NULL;}
 bool desk_ui_network_is_visible(void){return sidebar!=NULL;}
 int desk_ui_current_page(void){return page;}
-void desk_ui_page(int p){strip_thaw();desk_ui_close_detail();page=p<0?0:p>page_limit()?page_limit():p;lv_obj_scroll_to_x(viewport,page*350,LV_ANIM_OFF);render();}
+void desk_ui_page(int p){desk_ui_cancel_snapshot_animations();desk_ui_close_detail();page=p<0?0:p>page_limit()?page_limit():p;lv_obj_scroll_to_x(viewport,page*350,LV_ANIM_OFF);render();}
 void desk_ui_pause(void){paused=!paused;}
 uint32_t desk_ui_sample_sequence(void){return sequence;}
 static void game_cb(lv_event_t *e){(void)e;desk_ui_game_manual_open();}
 static void boot_progress(void *p,int32_t v){lv_obj_set_width(p,v);}
+static void game_boot_deleted(lv_event_t *event){if(game_boot_panel==lv_event_get_target_obj(event))game_boot_panel=NULL;}
+void desk_ui_cancel_snapshot_animations(void){
+ if(viewport){
+  lv_anim_delete(viewport,NULL);
+  strip_thaw();
+  int target=(lv_obj_get_scroll_x(viewport)+175)/350;
+  page=target<0?0:target>page_limit()?page_limit():target;
+  lv_obj_scroll_to_x(viewport,page*350,LV_ANIM_OFF);
+ }
+ if(game_boot_panel)lv_obj_delete(game_boot_panel);
+}
 static void game_boot(lv_obj_t *parent){
  lv_obj_t *boot=box(parent,0,0,1032,420,0x0A1022,16);lv_obj_add_flag(boot,LV_OBJ_FLAG_CLICKABLE);
  lv_obj_t *title=text(boot,0,0,"GAME MODE",&lv_font_montserrat_40,0xE5E5FF);lv_obj_align(title,LV_ALIGN_CENTER,0,-38);
  lv_obj_t *subtitle=text(boot,0,0,"PERFORMANCE MONITOR",&lv_font_montserrat_18,0x9EABCF);lv_obj_align(subtitle,LV_ALIGN_CENTER,0,12);
  box(boot,352,257,320,3,0x252E50,2);
- lv_obj_t *cached=transition_snapshot(boot);if(cached){lv_obj_delete(boot);boot=cached;lv_obj_add_flag(boot,LV_OBJ_FLAG_CLICKABLE);}
+ /* Drawn live: a plain panel with two lines of text costs less to draw than a 1032x420 snapshot took to take (board: most
+    of the 73 ms the GAME page needed to open), and only the beam changes while it shows. */
+ game_boot_panel=boot;
+ lv_obj_add_event_cb(boot,game_boot_deleted,LV_EVENT_DELETE,NULL);
  lv_obj_t *beam=box(boot,352,257,1,3,0x31E6EF,2);panel_animate(beam,boot_progress,1,320,340,false);
  panel_animate(boot,animation_lifetime,0,1,380,true);
  interaction_hold(420);
 }
 static lv_obj_t *panel(const char *title){
+ desk_ui_cancel_snapshot_animations();
  desk_ui_close_detail();
  if(retiring_panel){
   lv_anim_delete(retiring_panel,NULL);
@@ -1225,6 +1243,7 @@ static void clock_tick(lv_timer_t *t){
 }
 static void telemetry_commit(lv_timer_t *t){
  (void)t;
+ strip_thaw_if_idle(); /* interrupted snaps release their cache within this 50 ms tick */
  if(paused||!telemetry_pending||interaction_busy())return;
  telemetry_pending=false;
  render();
@@ -1240,6 +1259,15 @@ static void viewport_scrolled(lv_event_t *event){
  telemetry_pending=true;
  telemetry_commit(NULL);
 }
+/* Buttons, sliders, switches and the like scroll themselves into view when focused, and without a focus group every press
+   focuses something; the card strip then snapped that control's card to its left edge, so pressing NET's Clash switch with
+   NET in the middle slid the strip. The focused object is not always the one under the finger, so on every press, before
+   LVGL handles focus, nothing on screen keeps that behaviour (a few hundred flag writes, including controls created since). */
+static void no_scroll_on_focus_tree(lv_obj_t *o){
+ lv_obj_remove_flag(o,LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+ for(uint32_t i=0;i<lv_obj_get_child_count(o);i++)no_scroll_on_focus_tree(lv_obj_get_child(o,i));
+}
+static void no_scroll_on_focus(lv_event_t *event){(void)event;no_scroll_on_focus_tree(lv_screen_active());}
 void desk_ui_init(void){
  gso_snapshot_empty(&model);
  root=lv_screen_active();
@@ -1258,6 +1286,7 @@ void desk_ui_init(void){
  lv_obj_remove_flag(viewport,LV_OBJ_FLAG_SCROLL_MOMENTUM);
  lv_obj_add_event_cb(viewport,strip_scroll_begin,LV_EVENT_SCROLL_BEGIN,NULL);
  lv_obj_add_event_cb(viewport,viewport_scrolled,LV_EVENT_SCROLL_END,NULL);
+ for(lv_indev_t *input=lv_indev_get_next(NULL);input;input=lv_indev_get_next(input))if(lv_indev_get_type(input)==LV_INDEV_TYPE_POINTER){lv_indev_add_event_cb(input,no_scroll_on_focus,LV_EVENT_PRESSED,NULL);lv_indev_add_event_cb(input,strip_pointer_pressed,LV_EVENT_PRESSED,NULL);}
  sidebar=box(root,16,16,196,420,INSET,16);
  sidebar_title=text(sidebar,18,15,"GSO STATUS",&lv_font_montserrat_18,TEXT);
  clock_label=text(sidebar,18,49,"",&lv_font_montserrat_32,TEXT);

@@ -173,7 +173,27 @@ sealed class ClaudeUsage:IDisposable
     }
     public void Dispose(){stop.Cancel();stop.Dispose();}
 
-    internal static string DefaultDesktopDirectory()=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"Claude");
+    // The Store build of the desktop app keeps its data in %LOCALAPPDATA%\Claude-Data\<package>, the installer build in
+    // %APPDATA%\Claude. The directory whose config.json was written last is the one the running app uses.
+    static string? directoryCache;static DateTime directoryChecked;
+    internal static string DefaultDesktopDirectory()
+    {
+        if(directoryCache is not null&&DateTime.UtcNow-directoryChecked<TimeSpan.FromMinutes(1))return directoryCache;
+        var candidates=new List<string>{Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"Claude")};
+        try
+        {
+            var packaged=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Claude-Data");
+            if(Directory.Exists(packaged))candidates.AddRange(Directory.GetDirectories(packaged));
+        }
+        catch(Exception ex)when(ex is IOException or UnauthorizedAccessException){}
+        string best=candidates[0];DateTime bestWrite=DateTime.MinValue;
+        foreach(var path in candidates)
+        {
+            try{var info=new FileInfo(Path.Combine(path,"config.json"));if(info.Exists&&info.LastWriteTimeUtc>bestWrite){bestWrite=info.LastWriteTimeUtc;best=path;}}
+            catch(Exception ex)when(ex is IOException or UnauthorizedAccessException){}
+        }
+        directoryChecked=DateTime.UtcNow;return directoryCache=best;
+    }
     /// Unexpired desktop OAuth tokens that carry the profile scope, in cache order. Never throws for a missing app.
     internal static IReadOnlyList<string> ReadDesktopTokens(string? directory=null,Func<byte[],byte[]>? unprotect=null,Func<DateTimeOffset>? clock=null)
     {

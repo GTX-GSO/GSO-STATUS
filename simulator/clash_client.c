@@ -10,6 +10,7 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 #include "esp_http_client.h"
+#include "gss_wifi.h"
 static SemaphoreHandle_t gate;static TaskHandle_t worker;
 static void lock(void){xSemaphoreTake(gate,portMAX_DELAY);}static void unlock(void){xSemaphoreGive(gate);}
 #else
@@ -73,7 +74,15 @@ static void perform(void){
  unlock();
 }
 #ifdef ESP_PLATFORM
-static void run(void *unused){(void)unused;for(;;){perform();ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(10000));}}
+/* The TCP/IP stack only exists once the radio is up: wait for a connection instead of resolving the host at boot. */
+static void run(void *unused){
+ (void)unused;
+ for(;;){
+  gss_wifi_status wifi;gss_wifi_radio_status(&wifi);
+  if(!wifi.connected){ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(500));continue;}
+  perform();ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(10000));
+ }
+}
 #else
 static DWORD WINAPI run(void *unused){(void)unused;HANDLE events[]={stop,wake};for(;;){perform();if(WaitForMultipleObjects(2,events,FALSE,10000)==WAIT_OBJECT_0)break;}return 0;}
 #endif

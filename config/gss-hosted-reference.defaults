@@ -1,5 +1,5 @@
 # Active P4 Hosted defaults. Never automatically flash C5.
-# Source: Ergou-/esp32-gssxc5-aibox 8c6bc38bc7a082d9c4475e08c40778442a8dd8be
+# Source: Ergou-/esp32-p4xc5-aibox 8c6bc38bc7a082d9c4475e08c40778442a8dd8be
 # Requires esp_hosted 2.12.9 + esp_wifi_remote 1.6.1.
 CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP=y
 CONFIG_SLAVE_IDF_TARGET_ESP32C5=y
@@ -21,3 +21,25 @@ CONFIG_ESP_HOSTED_SLAVE_RESET_ON_EVERY_HOST_BOOTUP=y
 # Core load on the settings page: idle task run time over wall time.
 CONFIG_FREERTOS_USE_TRACE_FACILITY=y
 CONFIG_FREERTOS_GENERATE_RUN_TIME_STATS=y
+
+# Board: P4 v3.x (R3), 16MB flash, 32MB hex PSRAM. These used to live only in the committed sdkconfig; without them a
+# regenerated sdkconfig has no PSRAM (framebuffer allocation fails at boot), 2MB flash, the single-app partition table,
+# a UART console and a 100Hz tick. A sdkconfig generated from this file alone matches the committed one.
+CONFIG_ESP32P4_REV_MIN_301=y
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_400=y
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_HEX=y
+CONFIG_SPIRAM_SPEED_200M=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=4096
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_INT_WDT_TIMEOUT_MS=300
+# L2 cache stays at the default 128KB/64B: 256KB/128B left only ~58KB internal RAM and the ESP-Hosted SDIO driver then
+# asserted on a failed Rx buffer allocation as soon as Wi-Fi had traffic (board test 2026-10-20).
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
+# Code and read-only data (mostly fonts) run from 200MHz hex PSRAM instead of 80MHz DIO flash, as the vendor firmware does:
+# page renders -24%, opening a page 130->109ms on the board (2026-10-20). Costs 5.8MB PSRAM and ~0.3s boot.
+CONFIG_SPIRAM_XIP_FROM_PSRAM=y

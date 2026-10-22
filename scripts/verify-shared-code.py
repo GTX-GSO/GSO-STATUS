@@ -31,6 +31,19 @@ def main() -> int:
     cmake = (ROOT / "main" / "CMakeLists.txt").read_text(encoding="utf-8")
     listed = {pathlib.PurePosixPath(m).as_posix() for m in re.findall(r'"([^"]+\.c)"', cmake)}
     problems = []
+    versions = []
+    for filename, pattern, suffix in (
+        ("CMakeLists.txt", r'set\(PROJECT_VER\s+"([^"]+)"\)', ""),
+        ("main/gss_build_info.h", r'#define GSO_VERSION "([^"]+)"', "-gss"),
+        ("simulator/build_info.h", r'#define GSO_VERSION "([^"]+)"', ""),
+    ):
+        match = re.search(pattern, (ROOT / filename).read_text(encoding="utf-8"))
+        if not match or (suffix and not match[1].endswith(suffix)):
+            problems.append(f"missing/invalid display version in {filename}")
+        else:
+            versions.append(match[1].removesuffix(suffix) if suffix else match[1])
+    if len(set(versions)) > 1:
+        problems.append(f"display/app-descriptor versions differ: {versions}")
 
     for path in sorted((ROOT / "shared").glob("*.c")):
         if f"../shared/{path.name}" not in listed:
@@ -64,6 +77,7 @@ def main() -> int:
     common = len([p for p in (ROOT / "simulator").glob("*.c") if p.name not in SIMULATOR_ONLY])
     print(f"PASS: simulator and firmware share {shared} shared/*.c and {common} simulator/*.c files; "
           f"{len(SIMULATOR_ONLY)} Windows adapters are declared")
+    print(f"PASS: display/app-descriptor source versions agree ({versions[0]})")
     return 0
 
 

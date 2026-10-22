@@ -1,12 +1,12 @@
 # GSO STATUS SCREEN（GSS）实机
 
-当前源码0.7.4-gss（换板前未实机验证）；ESP32P4X AIBOX R3 / P4 v3.2，COM4。上电后自动连接已保存Wi-Fi并直连GSN，无需电脑端桥接。网络设置和验证边界见[P4 Wi-Fi直连](GSS-WiFi接入.md)。
+当前源码、应用描述符与`artifacts/GSS`打包版本均为0.7.25-gss，构建位于`build/`；2026-10-20已在新板（ESP32-P4 rev v3.2、16MiB Flash、32MiB PSRAM、COM5）上刷写并启动，除启动外的功能仍待实机验证。旧板为COM4，新板须以实际串口为准。上电后自动连接已保存Wi-Fi并直连GSN，无需电脑端桥接。当前工作顺序见[换板前工作清单](换板前工作清单.md)，网络设置见[P4 Wi-Fi直连](GSS-WiFi接入.md)。
 
 ## 编译与升级
 
 `scripts/build-gss.ps1` 使用本机Espressif Installation Manager登记的ESP-IDF6.1、配套Python和GCC。加 `-Flash` 会刷写COM4；串口诊断程序需先关闭。构建和烧录均不写eFuse。
 
-`scripts/package-gss.py` 根据SDK生成的地址打包固件；`artifacts/P4/flash-manifest.json` 包含地址、长度、SHA256。`artifacts/P4/flash-firmware.ps1` 校验文件后烧录。普通升级保留设备网络和亮度配置。
+`scripts/package-gss.py` 根据SDK生成的地址打包固件；`artifacts/GSS/flash-manifest.json` 包含地址、长度、SHA256。`artifacts/GSS/flash-firmware.ps1` 校验文件后烧录。交付前须重新构建并打包同版文件；`artifacts/P4`仅保留历史0.7.2实机包。普通升级保留设备网络和亮度配置。
 
 当前单factory应用位于0x20000，15.875MiB；NVS位于0x9000/24KiB，PHY位于0xF000/4KiB，GSN私有配置位于0x10000/24KiB。应用连续使用至16MiB末尾。没有OTA双应用，不整片擦除。GSN配置生成及首次写入见网络文档。
 

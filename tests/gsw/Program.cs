@@ -44,6 +44,32 @@ await using var missingTasks=new CodexTasks(Path.Combine(folder,"missing"),false
 var quotas=CodexQuota.ParseWindows(JsonNode.Parse("""{"rateLimitsByLimitId":{"codex":{"primary":{"usedPercent":0,"windowDurationMins":300,"resetsAt":1800000000},"secondary":{"usedPercent":null,"windowDurationMins":10080,"resetsAt":null}}}}""")!.AsObject());
 Check(quotas.Count==2,"quota windows");Check(quotas[0]?["remaining_percent"]?["value"]?.GetValue<double>()==100,"zero used is 100 remaining");Check(quotas[1]?["remaining_percent"]?["value"] is null,"missing quota not zero");Check(quotas[1]?["resets_at"] is null,"missing reset not fabricated");
 Console.WriteLine("PASS: lifecycle duplicate/parallel/partial/abort/truncate cases and quota null/window mapping");
+{
+    // Start at sign-in against throwaway keys under HKCU, never the real Run key.
+    var root=@"Software\GSOStatusTests\"+Guid.NewGuid().ToString("N");
+    try
+    {
+        var startup=new Autostart(root+@"\Run",root+@"\Approved","GSW test");
+        var gsw=Path.Combine(folder,"GSW.exe");var config=Path.Combine(folder,"gsw.json");
+        Check(startup.Read(gsw,config)==Autostart.State.Off,"no entry is off");
+        startup.Enable(gsw,config);
+        Check(startup.Read(gsw,config)==Autostart.State.On,"enabled for this copy");
+        using(var run=Microsoft.Win32.Registry.CurrentUser.OpenSubKey(root+@"\Run"))Check(run?.GetValue("GSW test") as string==Autostart.Command(gsw,config),"Run value quotes executable and configuration");
+        Check(startup.Read(Path.Combine(folder,"other","GSW.exe"),config)==Autostart.State.OtherCopy,"an entry for another copy is not this copy");
+        using(var approved=Microsoft.Win32.Registry.CurrentUser.CreateSubKey(root+@"\Approved"))approved.SetValue("GSW test",new byte[]{3,0,0,0,0,0,0,0,0,0,0,0},Microsoft.Win32.RegistryValueKind.Binary);
+        Check(startup.Read(gsw,config)==Autostart.State.Off,"disabled in Task Manager counts as off");
+        startup.Enable(gsw,config);
+        Check(startup.Read(gsw,config)==Autostart.State.On,"enabling again clears the Task Manager mark");
+        startup.Disable();
+        Check(startup.Read(gsw,config)==Autostart.State.Off,"disabled removes the entry");
+        startup.Disable();
+        var refused=false;try{startup.Enable("GSW.exe",config);}catch(ArgumentException){refused=true;}
+        Check(refused&&startup.Read(gsw,config)==Autostart.State.Off,"relative paths are refused");
+    }
+    finally{Microsoft.Win32.Registry.CurrentUser.DeleteSubKeyTree(root,false);}
+    using(var leftovers=Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\GSOStatusTests",true))if(leftovers is not null&&leftovers.SubKeyCount==0&&leftovers.ValueCount==0)Microsoft.Win32.Registry.CurrentUser.DeleteSubKey(@"Software\GSOStatusTests",false);
+    Console.WriteLine("PASS: start at sign-in on/off, other copy, Task Manager disable, relative path refusal");
+}
 
 // Claude Code transcripts: synthetic records only, isolated folder, no real sessions read.
 var claudeRoot=Path.Combine(folder,"claude-projects");var claudeProject=Path.Combine(claudeRoot,"C--work-demo");Directory.CreateDirectory(claudeProject);

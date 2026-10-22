@@ -2,6 +2,7 @@
 import datetime
 import hashlib
 import json
+import re
 import socket
 import subprocess
 import threading
@@ -105,10 +106,10 @@ try:
     except urllib.error.HTTPError as error:assert error.code==409
     with gate:assert len(calls)==before
     report=dict(scope='Built Windows GSN, native WinHTTP and LVGL clients, loopback HA only; no real household action',
-                gsn_version='0.1.18',display_version='0.5.17-dev',gsn_sha256=hashlib.sha256((ROOT/'artifacts/GSN/GSN.exe').read_bytes()).hexdigest(),
+                gsn_version=re.search(r'gso-status-nas:([0-9.]+)-',(ROOT/'scripts/package-gsn.py').read_text(encoding='utf-8')).group(1),display_version=re.search(r'#define GSO_VERSION "([^"]+)"',(ROOT/'simulator/build_info.h').read_text(encoding='utf-8')).group(1),gsn_sha256=hashlib.sha256((ROOT/'artifacts/GSN/GSN.exe').read_bytes()).hexdigest(),
                 no_windows_agent_required=True,missing_room_temperature_preserved=True,native_light_and_stop=True,lvgl_double_touch_and_cover_switch=True,lvgl_slider_release_and_mode_selection=True,
                 service_calls=before,old_epoch_replay_rejected=True,real_household_actions=0,passed=True)
-    output=ROOT/'artifacts/verification/home-0.1.18.json';output.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    output=ROOT/'artifacts/verification/home-current.json';output.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,indent=2))
 finally:
     if process is not None and process.poll() is None:process.terminate();process.wait(timeout=3)

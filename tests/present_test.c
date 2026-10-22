@@ -85,7 +85,11 @@ int main(void){
   check(count==1,"a small change after a full frame converts both (covered area is large, so one full area)");
   gss_present_add(&t,(gss_rect){2,2,3,3},W,H);
   count=gss_present_plan(&t,false,plan,W,H);
-  check(count==2,"two small areas stay separate");}
+  check(count==2,"two small areas stay separate");
+  gss_rect strip={7,1,W-1,H-2}; /* like the card strip: three quarters of the screen beside the sidebar */
+  gss_present_add(&t,strip,W,H);gss_present_plan(&t,false,plan,W,H);
+  gss_present_add(&t,strip,W,H);count=gss_present_plan(&t,false,plan,W,H);
+  check(count==1&&plan[0].x1==7&&plan[0].x2==W-1&&plan[0].y1==1&&plan[0].y2==H-2,"a large repeated change converts its bounding box, not the whole screen");}
  /* areas outside the picture are clamped or ignored */
  {gss_present_state t;gss_present_init(&t);t.full_frames=0;gss_rect plan[GSS_PRESENT_MAX_PLAN];
   gss_present_add(&t,(gss_rect){-5,-5,2,2},W,H);gss_present_add(&t,(gss_rect){W+3,1,W+9,4},W,H);

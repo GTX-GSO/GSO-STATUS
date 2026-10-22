@@ -4,3 +4,6 @@ target_compile_definitions(${COMPONENT_LIB} PUBLIC LV_CONF_INCLUDE_SIMPLE)
 
 # Optimize the renderer and shared model for the actual P4 rather than debug stepping.
 target_compile_options(${COMPONENT_LIB} PRIVATE -O2)
+
+# lv_freertos.c includes <atomic.h> without the freertos/ prefix.
+target_include_directories(${COMPONENT_LIB} PRIVATE "$ENV{IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")

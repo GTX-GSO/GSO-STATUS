@@ -38,8 +38,8 @@ for architecture in ('arm64', 'armv7'):
     config_data = encoded(config)
     config_name = hashlib.sha256(config_data).hexdigest() + '.json'
     layer_name = digest + '/layer.tar'
-    manifest = [dict(Config=config_name, RepoTags=['gso-status-nas:0.1.33-' + architecture], Layers=[layer_name])]
-    target = output / ('GSN-0.1.33-' + architecture + '.docker.tar')
+    manifest = [dict(Config=config_name, RepoTags=['gso-status-nas:0.1.35-' + architecture], Layers=[layer_name])]
+    target = output / ('GSN-0.1.35-' + architecture + '.docker.tar')
     with tarfile.open(target, mode='w') as archive:
         add(archive, config_name, config_data)
         add(archive, layer_name, layer_data)

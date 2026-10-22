@@ -66,12 +66,13 @@ static void level_render(void){
  snprintf(line,sizeof(line),"%.1f°",fabsf(roll));
  const char *direction=band==GSO_LEVEL_FLATNESS_LEVEL?"已摆平":roll>0?"右侧偏低":"左侧偏低";
  if(l->state==GSO_LEVEL_MOVING)direction="请保持屏幕不动";
- /* the bubble moves toward the higher side: the right side low sends it to the left */
- float offset=-roll*LEVEL_PIXELS_PER_DEGREE;
+ /* the bubble sits on the low side (right side low puts it on the right), which reads more naturally than a real spirit level */
+ float offset=roll*LEVEL_PIXELS_PER_DEGREE;
  float limit=(LEVEL_TUBE_WIDTH-6-LEVEL_BUBBLE)/2.0f-4;
  offset=offset>limit?limit:offset<-limit?-limit:offset;
  level_show(line,direction,l->state==GSO_LEVEL_MOVING?AMBER:color,(int)(offset<0?offset-0.5f:offset+0.5f),color,true);
 }
+int desk_ui_test_level_bubble_x(void){return level_bubble_x;}
 static void level_tick(lv_timer_t *t){
  (void)t;
  gso_accel sample;

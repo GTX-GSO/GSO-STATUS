@@ -1,4 +1,4 @@
-param([switch]$NoDisplay)
+﻿param([switch]$NoDisplay)
 $ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot
 Push-Location $projectRoot

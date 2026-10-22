@@ -119,7 +119,7 @@ sealed class CodexQuota : IAsyncDisposable
                     }
                     throw new InvalidDataException("rpc_response_missing");
                 }
-                await Request(1,"initialize",new JsonObject{["clientInfo"]=new JsonObject{["name"]="gso_status_win_readonly",["title"]="GSO STATUS WIN",["version"]="0.1.0"},["capabilities"]=new JsonObject{["experimentalApi"]=false}});
+                await Request(1,"initialize",new JsonObject{["clientInfo"]=new JsonObject{["name"]="gso_status_win_readonly",["title"]="GSO STATUS WIN",["version"]=typeof(CodexQuota).Assembly.GetName().Version?.ToString(3)??"unknown"},["capabilities"]=new JsonObject{["experimentalApi"]=false}});
                 await process.StandardInput.WriteLineAsync("{\"method\":\"initialized\"}");await process.StandardInput.FlushAsync();
                 var result=await Request(2,"account/rateLimits/read");var parsed=ParseWindows(result);
                 if(parsed.Count==0)throw new InvalidDataException("quota_windows_missing");

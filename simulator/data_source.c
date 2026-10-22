@@ -126,6 +126,7 @@ uint64_t desk_data_now_ms(void){return GetTickCount64();}
 desk_connection_status desk_data_status(void){return (desk_connection_status)InterlockedCompareExchange(&connection_status,0,0);}
 
 #ifdef GSO_TEST
+void desk_data_test_snapshot(const gso_snapshot *snapshot){AcquireSRWLockExclusive(&lock);latest=*snapshot;ReleaseSRWLockExclusive(&lock);desk_data_test_status(DESK_ONLINE);}
 void desk_data_test_thumbnail(const char *key,const uint8_t *pixels){AcquireSRWLockExclusive(&lock);memcpy(thumb_pixels,pixels,GSO_THUMBNAIL_BYTES);snprintf(thumb_key,sizeof(thumb_key),"%s",key);ReleaseSRWLockExclusive(&lock);}
 void desk_data_test_status(desk_connection_status status){InterlockedExchange(&connection_status,status);InterlockedExchange(&connected,status==DESK_ONLINE);}
 #endif

@@ -10,11 +10,11 @@ uint32_t desk_ui_theme_color(uint32_t value){for(unsigned i=0;i<sizeof(palettes)
 static lv_color_t mapped(lv_color_t color,bool light){uint32_t value=lv_color_to_int(color)&0xFFFFFF;for(unsigned i=0;i<sizeof(palettes)/sizeof(palettes[0]);i++)if(value==palettes[i][light?0:1])return lv_color_hex(palettes[i][light?1:0]);return color;}
 static void recolor(lv_obj_t *o,bool light){
  const lv_part_t parts[]={LV_PART_MAIN,LV_PART_INDICATOR,LV_PART_KNOB,LV_PART_ITEMS};
- for(int i=0;i<4;i++){lv_part_t p=parts[i];lv_obj_set_style_bg_color(o,mapped(lv_obj_get_style_bg_color(o,p),light),p);lv_obj_set_style_text_color(o,mapped(lv_obj_get_style_text_color(o,p),light),p);lv_obj_set_style_arc_color(o,mapped(lv_obj_get_style_arc_color(o,p),light),p);lv_obj_set_style_line_color(o,mapped(lv_obj_get_style_line_color(o,p),light),p);}
+ for(int i=0;i<4;i++){lv_part_t p=parts[i];lv_obj_set_style_bg_color(o,mapped(lv_obj_get_style_bg_color(o,p),light),p);lv_obj_set_style_text_color(o,mapped(lv_obj_get_style_text_color(o,p),light),p);lv_obj_set_style_arc_color(o,mapped(lv_obj_get_style_arc_color(o,p),light),p);lv_obj_set_style_line_color(o,mapped(lv_obj_get_style_line_color(o,p),light),p);lv_style_value_t border;if(lv_obj_get_local_style_prop(o,LV_STYLE_BORDER_COLOR,&border,p)==LV_STYLE_RES_FOUND)lv_obj_set_style_border_color(o,mapped(border.color,light),p);}
  lv_obj_set_style_bg_color(o,mapped(lv_obj_get_style_bg_color(o,LV_PART_MAIN|LV_STATE_PRESSED),light),LV_STATE_PRESSED);
  for(uint32_t i=0;i<lv_obj_get_child_count(o);i++)recolor(lv_obj_get_child(o,i),light);
 }
-void desk_ui_theme_set(bool light){if(light==light_theme)return;recolor(lv_screen_active(),light);light_theme=light;}
+void desk_ui_theme_set(bool light){if(light==light_theme)return;desk_ui_cancel_snapshot_animations();recolor(lv_screen_active(),light);light_theme=light;}
 bool desk_ui_solar_day(int year,int month,int day,int minute,int *rise,int *set){
  static const int before[]={0,31,59,90,120,151,181,212,243,273,304,334};
  bool leap=year%4==0&&(year%100!=0||year%400==0);int doy=before[month-1]+day+(leap&&month>2);

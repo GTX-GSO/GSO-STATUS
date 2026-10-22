@@ -7,8 +7,14 @@ void desk_ui_detail(int item);
 void desk_ui_close_detail(void);
 unsigned desk_ui_strip_frozen_cards(void); /* test hooks: snapshots standing in for the cards while the strip is dragged */
 void desk_ui_test_strip_freeze(int direction);
+int desk_ui_test_level_bubble_x(void);
 void desk_ui_test_strip_thaw(void);
+void desk_ui_cancel_snapshot_animations(void); /* cancel stale cached pixels before theme/navigation changes */
+#ifdef GSO_TEST
+void desk_ui_test_cache_limit(uint32_t bytes);
+#endif
 int desk_ui_strip_scroll_x(void);
+uint32_t desk_ui_strip_freeze_ms(void); /* how long the last freeze spent taking snapshots */
 uint32_t desk_ui_animation_cache_bytes(void);
 uint32_t desk_ui_animation_cache_peak_bytes(void);
 void desk_ui_pause(void);

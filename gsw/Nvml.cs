@@ -18,25 +18,44 @@ sealed class Nvml : IDisposable
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] delegate int GetClock(IntPtr device,uint type,out uint value);
     IntPtr library, device;
     bool initialized;
+    readonly uint index;
+    long retryAt;
+    // NVML results that mean the handle is gone (driver reset or update) rather than one unsupported reading.
+    const int Uninitialized=1,InvalidArgument=2,GpuIsLost=15;
     T Function<T>(string name) where T : Delegate => Marshal.GetDelegateForFunctionPointer<T>(NativeLibrary.GetExport(library, name));
-    public Nvml(int index)
+    public Nvml(int index){this.index=(uint)index;Open();}
+    // Started at sign-in, GSW can come up before the display driver; a driver reset or update also invalidates the handle.
+    // Either way the GPU is looked up again every 30 seconds instead of staying empty until GSW restarts.
+    void Open()
     {
-        foreach (var path in new[] { Path.Combine(Environment.SystemDirectory,"nvml.dll"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),@"NVIDIA Corporation\NVSMI\nvml.dll") })
-            if (NativeLibrary.TryLoad(path, out library)) break;
+        retryAt=Environment.TickCount64+30000;
+        if (library == IntPtr.Zero)
+            foreach (var path in new[] { Path.Combine(Environment.SystemDirectory,"nvml.dll"), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),@"NVIDIA Corporation\NVSMI\nvml.dll") })
+                if (NativeLibrary.TryLoad(path, out library)) break;
         if (library == IntPtr.Zero) return;
         try
         {
-            initialized = Function<Init>("nvmlInit_v2")() == 0;
-            if (initialized) Function<DeviceByIndex>("nvmlDeviceGetHandleByIndex_v2")((uint)index, out device);
+            if (!initialized) initialized = Function<Init>("nvmlInit_v2")() == 0;
+            if (initialized && Function<DeviceByIndex>("nvmlDeviceGetHandleByIndex_v2")(index, out device) != 0) device=IntPtr.Zero;
         }
         catch { device=IntPtr.Zero; }
     }
+    void Lost()
+    {
+        device=IntPtr.Zero;
+        try { if (initialized) Function<Init>("nvmlShutdown")(); } catch { }
+        initialized=false;retryAt=Environment.TickCount64+30000;
+    }
     public JsonObject Sample()
     {
-        var h = Model.Hardware(); if (device == IntPtr.Zero) return h;
+        var h = Model.Hardware();
+        if (device == IntPtr.Zero && Environment.TickCount64 >= retryAt) Open();
+        if (device == IntPtr.Zero) return h;
+        int health=Function<GetUtil>("nvmlDeviceGetUtilizationRates")(device,out var util);
+        if (health is Uninitialized or InvalidArgument or GpuIsLost) { Lost(); return h; }
         var name = new StringBuilder(160);
         if (Function<GetName>("nvmlDeviceGetName")(device,name,160)==0) h["model"]=name.ToString();
-        if (Function<GetUtil>("nvmlDeviceGetUtilizationRates")(device,out var util)==0) h["load_percent"]=Model.Metric(util.Gpu);
+        if (health==0) h["load_percent"]=Model.Metric(util.Gpu);
         if (Function<GetMem>("nvmlDeviceGetMemoryInfo")(device,out var mem)==0) { h["memory_used_bytes"]=Model.Bytes(mem.Used); h["memory_total_bytes"]=Model.Bytes(mem.Total); }
         if (Function<GetTemp>("nvmlDeviceGetTemperature")(device,0,out var temp)==0) h["temperature_c"]=Model.Metric(temp);
         if (Function<GetPower>("nvmlDeviceGetPowerUsage")(device,out var power)==0) h["power_w"]=Model.Metric(power/1000.0);

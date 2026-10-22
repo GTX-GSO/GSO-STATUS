@@ -11,7 +11,7 @@ foreach($path in @($zigExe,(Join-Path $lvglDir 'lvgl.h'),(Join-Path $sourceDir '
 }
 New-Item -ItemType Directory -Force -Path $workDir,$outputDir | Out-Null
 $buildTime = [DateTimeOffset]::UtcNow.ToOffset([TimeSpan]::FromHours(8)).ToString('yyyy-MM-dd HH:mm:ss')
-[System.IO.File]::WriteAllText((Join-Path $sourceDir 'build_info.h'),("#pragma once`n#define GSO_VERSION `"0.7.23`"`n#define GSO_BUILD_TIME `""+$buildTime+" UTC+8`"`n"),[System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText((Join-Path $sourceDir 'build_info.h'),("#pragma once`n#define GSO_VERSION `"1.0.0`"`n#define GSO_BUILD_TIME `""+$buildTime+" UTC+8`"`n"),[System.Text.UTF8Encoding]::new($false))
 $arguments = @('-target','x86_64-windows-gnu','-O2','-std=c11','-DLV_CONF_INCLUDE_SIMPLE',('-I'+$sourceDir),('-I'+$lvglDir))
 $arguments += @(('-I'+(Join-Path $projectRoot 'shared')),('-I'+(Join-Path $projectRoot 'vendor/cjson')),'-DCJSON_NESTING_LIMIT=32')
 if($Test) { $arguments += '-DGSO_TEST' }

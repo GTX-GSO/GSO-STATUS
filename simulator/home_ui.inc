@@ -153,6 +153,7 @@ static void home_summary(lv_obj_t *parent){
   lv_obj_add_flag(v->tile,LV_OBJ_FLAG_HIDDEN);
  }
 }
+static lv_obj_t *home_content; /* the detail page's tile container while it is open */
 static void home_details(lv_obj_t *parent){
  home_hint[1]=small(parent,612,16,"等待绑定设备",MUTED);
  lv_obj_set_width(home_hint[1],400);
@@ -169,42 +170,46 @@ static void home_details(lv_obj_t *parent){
  lv_obj_set_style_pad_bottom(content,12,0);
  home_empty[1]=cn(content,4,38,"未接入",AMBER);
  lv_obj_add_flag(home_empty[1],LV_OBJ_FLAG_FLOATING);
- for(unsigned i=0;i<GSO_MAX_HOME_ENTITIES;i++){
-  home_view *v=&home_views[1][i];
-  v->tile=box(content,0,0,HOME_TILE_W,160,INSET,12);
-  v->name=small(v->tile,20,16,"",TEXT);
-  lv_obj_set_width(v->name,226);
-  lv_label_set_long_mode(v->name,LV_LABEL_LONG_DOT);
-  v->power=home_power(v->tile,HOME_TILE_W-64,12,52,i);
-  v->state=small(v->tile,20,46,"",MUTED);
-  v->temperatures=small(v->tile,20,74,"",MUTED);
-  lv_obj_set_width(v->temperatures,HOME_TILE_W-40);
-  v->feedback=small(v->tile,20,124,"",MUTED);
-  lv_obj_set_width(v->feedback,HOME_TILE_W-40);
-  lv_label_set_long_mode(v->feedback,LV_LABEL_LONG_DOT);
-  for(unsigned slot=0;slot<2;slot++){
-   v->slider_labels[slot]=small(v->tile,20,112+slot*66,"",MUTED);
-   v->sliders[slot]=lv_slider_create(v->tile);
-   lv_obj_set_pos(v->sliders[slot],30,146+slot*66);
-   lv_obj_set_size(v->sliders[slot],HOME_TILE_W-60,12);
-   lv_obj_set_style_bg_color(v->sliders[slot],c(LINE),LV_PART_MAIN);
-   lv_obj_set_style_bg_color(v->sliders[slot],c(GREEN),LV_PART_INDICATOR);
-   lv_obj_set_style_bg_color(v->sliders[slot],c(TEXT),LV_PART_KNOB);
-   lv_obj_set_style_pad_all(v->sliders[slot],10,LV_PART_KNOB);
-   lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_KNOB);
-   lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_MAIN);
-   lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_INDICATOR);
-   lv_obj_add_event_cb(v->sliders[slot],home_slide,LV_EVENT_ALL,(void *)(uintptr_t)((i<<8)|slot));
-  }
-  for(unsigned a=0;a<2;a++){
-   v->covers[a]=box(v->tile,20+a*((HOME_TILE_W-50)/2+10),112,(HOME_TILE_W-50)/2,52,LINE,10);
-   lv_obj_t *name=cn(v->covers[a],0,0,a?"关闭":"打开",TEXT);
-   lv_obj_center(name);
-   lv_obj_add_flag(v->covers[a],LV_OBJ_FLAG_CLICKABLE);
-   lv_obj_add_event_cb(v->covers[a],home_cover_click,LV_EVENT_CLICKED,(void *)(uintptr_t)((i<<16)|(a?GSO_HOME_CLOSE:GSO_HOME_OPEN)));
-  }
-  lv_obj_add_flag(v->tile,LV_OBJ_FLAG_HIDDEN);
+ home_content=content;
+}
+/* Detail tiles are made only for the devices there are, as render_home first needs them: building all sixteen with their
+   sliders and buttons took about 110 ms on the board every time the page opened. They follow in index order, so the
+   wrapping rows keep the device order when more devices appear later. */
+static void home_create_tile(unsigned i){
+ home_view *v=&home_views[1][i];
+ v->tile=box(home_content,0,0,HOME_TILE_W,160,INSET,12);
+ v->name=small(v->tile,20,16,"",TEXT);
+ lv_obj_set_width(v->name,226);
+ lv_label_set_long_mode(v->name,LV_LABEL_LONG_DOT);
+ v->power=home_power(v->tile,HOME_TILE_W-64,12,52,i);
+ v->state=small(v->tile,20,46,"",MUTED);
+ v->temperatures=small(v->tile,20,74,"",MUTED);
+ lv_obj_set_width(v->temperatures,HOME_TILE_W-40);
+ v->feedback=small(v->tile,20,124,"",MUTED);
+ lv_obj_set_width(v->feedback,HOME_TILE_W-40);
+ lv_label_set_long_mode(v->feedback,LV_LABEL_LONG_DOT);
+ for(unsigned slot=0;slot<2;slot++){
+  v->slider_labels[slot]=small(v->tile,20,112+slot*66,"",MUTED);
+  v->sliders[slot]=lv_slider_create(v->tile);
+  lv_obj_set_pos(v->sliders[slot],30,146+slot*66);
+  lv_obj_set_size(v->sliders[slot],HOME_TILE_W-60,12);
+  lv_obj_set_style_bg_color(v->sliders[slot],c(LINE),LV_PART_MAIN);
+  lv_obj_set_style_bg_color(v->sliders[slot],c(GREEN),LV_PART_INDICATOR);
+  lv_obj_set_style_bg_color(v->sliders[slot],c(TEXT),LV_PART_KNOB);
+  lv_obj_set_style_pad_all(v->sliders[slot],10,LV_PART_KNOB);
+  lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_KNOB);
+  lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_MAIN);
+  lv_obj_set_style_radius(v->sliders[slot],LV_RADIUS_CIRCLE,LV_PART_INDICATOR);
+  lv_obj_add_event_cb(v->sliders[slot],home_slide,LV_EVENT_ALL,(void *)(uintptr_t)((i<<8)|slot));
  }
+ for(unsigned a=0;a<2;a++){
+  v->covers[a]=box(v->tile,20+a*((HOME_TILE_W-50)/2+10),112,(HOME_TILE_W-50)/2,52,LINE,10);
+  lv_obj_t *name=cn(v->covers[a],0,0,a?"关闭":"打开",TEXT);
+  lv_obj_center(name);
+  lv_obj_add_flag(v->covers[a],LV_OBJ_FLAG_CLICKABLE);
+  lv_obj_add_event_cb(v->covers[a],home_cover_click,LV_EVENT_CLICKED,(void *)(uintptr_t)((i<<16)|(a?GSO_HOME_CLOSE:GSO_HOME_OPEN)));
+ }
+ lv_obj_add_flag(v->tile,LV_OBJ_FLAG_HIDDEN);
 }
 static void home_widget_enabled(lv_obj_t *o,bool enabled,bool dim){
  if(enabled){if(lv_obj_has_state(o,LV_STATE_DISABLED))lv_obj_remove_state(o,LV_STATE_DISABLED);}
@@ -248,6 +253,7 @@ static void render_home(void){
   }
   for(unsigned i=0;i<GSO_MAX_HOME_ENTITIES;i++){
    home_view *v=&home_views[group][i];
+   if(!v->tile&&group==1&&home_content&&i<model.home_count)home_create_tile(i);
    if(!v->tile)continue;
    home_visible(v->tile,i<model.home_count);
    if(i>=model.home_count)continue;
@@ -264,9 +270,9 @@ static void render_home(void){
    bool active=q==GSO_OK&&home_active(e),available=ready&&!command.busy&&q==GSO_OK;
    uint32_t accent=q!=GSO_OK?AMBER:active?GREEN:LINE;
    lv_obj_set_style_bg_color(v->tile,c(active?0x203A34:INSET),0);
-   lv_obj_set_style_border_color(v->tile,c(accent),0);
-   lv_obj_set_style_border_width(v->tile,active?2:1,0);
-   lv_obj_set_style_border_opa(v->tile,255,0);
+   if(!lv_color_eq(lv_obj_get_style_border_color(v->tile,0),c(accent)))lv_obj_set_style_border_color(v->tile,c(accent),0);
+   if(lv_obj_get_style_border_width(v->tile,0)!=(active?2:1))lv_obj_set_style_border_width(v->tile,active?2:1,0);
+   if(lv_obj_get_style_border_opa(v->tile,0)!=255)lv_obj_set_style_border_opa(v->tile,255,0);
    lv_label_set_text(v->name,e->name);
    lv_obj_set_style_text_color(v->name,c(active?TEXT:MUTED),0);
    lv_label_set_text(v->state,q!=GSO_OK?quality_text(q):group?home_state_name(e->state):"");
@@ -396,7 +402,7 @@ static void render_home(void){
    }
  }
 }
-static void home_close_views(void){memset(home_views[1],0,sizeof(home_views[1]));home_empty[1]=home_hint[1]=NULL;}
+static void home_close_views(void){memset(home_views[1],0,sizeof(home_views[1]));home_empty[1]=home_hint[1]=NULL;home_content=NULL;}
 bool desk_ui_home_power_center(int *x,int *y){
  for(unsigned i=0;i<GSO_MAX_HOME_ENTITIES;i++){
   home_view *v=&home_views[1][i];

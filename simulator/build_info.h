@@ -1,3 +1,3 @@
 #pragma once
-#define GSO_VERSION "0.7.23"
-#define GSO_BUILD_TIME "2026-10-18 16:12:07 UTC+8"
+#define GSO_VERSION "1.0.0"
+#define GSO_BUILD_TIME "2026-10-20 22:36:34 UTC+8"

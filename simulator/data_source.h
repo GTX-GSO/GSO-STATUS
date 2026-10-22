@@ -16,6 +16,7 @@ typedef enum { DESK_CONNECTING, DESK_ONLINE, DESK_NETWORK_OFFLINE, DESK_GSN_OFFL
 desk_connection_status desk_data_status(void);
 
 #ifdef GSO_TEST
+void desk_data_test_snapshot(const gso_snapshot *snapshot);
 void desk_data_test_status(desk_connection_status status);
 void desk_data_test_thumbnail(const char *key,const uint8_t *pixels); /* pretend the picture for key has arrived */
 #endif

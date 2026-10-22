@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot
 $recordFile=Join-Path $projectRoot 'work/local-processes.json'
 if(!(Test-Path -LiteralPath $recordFile)){Write-Output '没有记录本机联调进程。';exit 0}

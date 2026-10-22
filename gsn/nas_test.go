@@ -139,7 +139,7 @@ func TestNasDisk(t *testing.T) {
 	}
 	state = diskStandby
 	s.Sample(now.Add(122 * time.Second))
-	if snap := s.Snapshot(now.Add(122 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != nil || nasReason(snap, "disk_temperature_c") != "disk_standby" {
+	if snap := s.Snapshot(now.Add(122 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != 41.0 {
 		t.Fatalf("a sleeping disk is reported, not read: reads=%d %v", reads, snap)
 	}
 	if st := s.Snapshot(now.Add(122 * time.Second))["disk_state"]; st != "standby" {
@@ -150,7 +150,7 @@ func TestNasDisk(t *testing.T) {
 	}
 	state = diskUnknown
 	s.Sample(now.Add(183 * time.Second))
-	if snap := s.Snapshot(now.Add(183 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != nil {
+	if snap := s.Snapshot(now.Add(183 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != 41.0 {
 		t.Fatalf("a disk that cannot report its power state is never read: reads=%d %v", reads, snap)
 	}
 	state = diskActive
@@ -158,127 +158,52 @@ func TestNasDisk(t *testing.T) {
 	if reads != 2 || nasValue(s.Snapshot(now.Add(244*time.Second)), "disk_temperature_c") != 41.0 {
 		t.Fatalf("a disk that woke up is read at once: reads=%d", reads)
 	}
-	if n := nasValue(s.Snapshot(now.Add(244*time.Second)), "disk_wake_count_today"); n != 1.0 {
-		t.Fatalf("one wake-up so far: %v", n)
+	if n := nasValue(s.Snapshot(now.Add(244*time.Second)), "disk_wake_count_today"); n != 0.0 {
+		t.Fatalf("unknown interval prevents an unconfirmed wake count: %v", n)
 	}
 	failure = errors.New("io")
 	s.Sample(now.Add(366 * time.Second))
-	if snap := s.Snapshot(now.Add(366 * time.Second)); reads != 3 || nasValue(snap, "disk_temperature_c") != nil || nasReason(snap, "disk_temperature_c") != "disk_unavailable" {
-		t.Fatalf("a failed read is unavailable: reads=%d %v", reads, snap)
+	if snap := s.Snapshot(now.Add(366 * time.Second)); reads != 3 || nasValue(snap, "disk_temperature_c") != 41.0 {
+		t.Fatalf("a failed read retains the last valid temperature: reads=%d %v", reads, snap)
 	}
-	if v := nasValue(s.Snapshot(now.Add(366*time.Second+time.Hour)), "disk_temperature_c"); v != nil {
+	if v := nasValue(s.Snapshot(now.Add(366*time.Second+3*time.Hour)), "disk_temperature_c"); v != nil {
 		t.Fatalf("an old disk reading expires: %v", v)
 	}
 }
 
-func TestNasDiskIOOnly(t *testing.T) {
+func TestNasPowerOnlyState(t *testing.T) {
 	now := time.Now()
 	s := fakeHost(t, "cpu  100 0 50 800 50 0 0 0\n")
-	s.cfg = &NasConfig{Disk: "/dev/sda", DiskIntervalSeconds: 60, DiskIOOnly: true}
-	reads := 0
-	s.power = func(string) string { t.Fatal("io-only mode never asks the drive anything"); return diskUnknown }
-	s.smart = func(string) (float64, error) { reads++; return 39.6, nil }
-	stat := filepath.Join(s.sys, "block/sda/stat")
-	counters := func(r, w int) {
-		writeFake(t, stat, fmt.Sprintf("%8d 1 2 3 %8d 4 5 6 0 7 8\n", r, w))
-	}
-	counters(100, 200)
-	for i := 0; i < 4; i++ {
-		s.Sample(now.Add(time.Duration(i*5) * time.Second))
-	}
-	if snap := s.Snapshot(now.Add(20 * time.Second)); reads != 0 || nasReason(snap, "disk_temperature_c") != "disk_idle" {
-		t.Fatalf("a quiet disk is not read: reads=%d %v", reads, snap)
-	}
-	if st := s.Snapshot(now.Add(20 * time.Second))["disk_state"]; st != "quiet" {
-		t.Fatalf("without any I/O or power answer the state is quiet, got %v", st)
-	}
-	counters(101, 200)
-	s.Sample(now.Add(25 * time.Second))
-	if st := s.Snapshot(now.Add(25 * time.Second))["disk_state"]; st != "active" {
-		t.Fatalf("a disk that served requests is active, got %v", st)
-	}
-	if snap := s.Snapshot(now.Add(25 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != 39.6 {
-		t.Fatalf("a disk that just served requests is read: reads=%d %v", reads, snap)
-	}
-	counters(150, 230)
-	counters(150, 230)
-	s.Sample(now.Add(30 * time.Second))
-	if reads != 1 {
-		t.Fatalf("the interval is respected while the disk is busy: reads=%d", reads)
-	}
-	s.Sample(now.Add(35 * time.Second))
-	if st := s.Snapshot(now.Add(45 * time.Second))["disk_state"]; st != "active" {
-		t.Fatalf("without a drive answer the disk counts as awake until its idle timeout has passed, got %v", st)
-	}
-	s.Sample(now.Add(400 * time.Second))
-	if st := s.Snapshot(now.Add(400 * time.Second))["disk_state"]; st != "standby" {
-		t.Fatalf("five minutes after the last request the disk is taken to sleep, got %v", st)
-	}
-	if snap := s.Snapshot(now.Add(36 * time.Second)); reads != 1 || nasValue(snap, "disk_temperature_c") != 39.6 {
-		t.Fatalf("the last reading stays while the disk is quiet: reads=%d %v", reads, snap)
-	}
-	counters(151, 230)
-	s.Sample(now.Add(90 * time.Second))
-	if reads != 2 {
-		t.Fatalf("a busy disk is read again after the interval: reads=%d", reads)
-	}
-	if v := nasValue(s.Snapshot(now.Add(90*time.Second+time.Hour)), "disk_temperature_c"); v != nil {
-		t.Fatalf("an old reading expires: %v", v)
-	}
-}
-
-func TestNasWakeCount(t *testing.T) {
-	// 2026-10-18 23:00 UTC is 07:00 on the 19th in Beijing.
-	now := time.Date(2026, 10, 18, 23, 0, 0, 0, time.UTC)
-	s := fakeHost(t, "cpu  100 0 50 800 50 0 0 0\n")
-	s.cfg = &NasConfig{Disk: "/dev/sda", DiskIOOnly: true, DiskSleepSeconds: 60}
-	s.power = func(string) string { t.Fatal("io-only never asks the drive"); return diskUnknown }
+	s.cfg = &NasConfig{Disk: "/dev/sda"}
+	state := diskStandby
+	s.power = func(string) string { return state }
 	s.smart = func(string) (float64, error) { return 40, nil }
 	stat := filepath.Join(s.sys, "block/sda/stat")
-	counters := func(r int) { writeFake(t, stat, fmt.Sprintf("%d 1 2 3 5 4 5 6 0 7 8\n", r)) }
-	at := func(seconds int, reads int) {
-		counters(reads)
-		s.Sample(now.Add(time.Duration(seconds) * time.Second))
+	writeFake(t, stat, "10 1 2 3 5 4 5 6 0 7 8\n")
+	s.Sample(now)
+	writeFake(t, stat, "11 1 2 3 5 4 5 6 0 7 8\n")
+	s.Sample(now.Add(5 * time.Second))
+	if s.diskState() != "standby" {
+		t.Fatal("I/O must not override standby")
 	}
-	state := func(seconds int) (string, any) {
-		snap := s.Snapshot(now.Add(time.Duration(seconds) * time.Second))
-		return snap["disk_state"].(string), nasValue(snap, "disk_wake_count_today")
+	state = diskActive
+	s.Sample(now.Add(70 * time.Second))
+	if s.diskState() != "active" || s.wakeCount(now) != 1 {
+		t.Fatal("confirmed transition must count once")
 	}
-	at(0, 10)
-	at(5, 11) // requests soon after start: awake, but a wake-up was not seen
-	if st, n := state(5); st != "active" || n != 0.0 {
-		t.Fatalf("first requests: %s %v", st, n)
+	state = diskUnknown
+	s.Sample(now.Add(140 * time.Second))
+	if s.diskState() != "quiet" {
+		t.Fatal("unknown power must not invent sleep")
 	}
-	at(30, 11)
-	at(66, 11)
-	if st, _ := state(66); st != "standby" {
-		t.Fatalf("a minute after the last request the disk sleeps: %s", st)
-	}
-	at(100, 12)
-	if st, n := state(100); st != "active" || n != 1.0 {
-		t.Fatalf("a request after sleeping is a wake-up: %s %v", st, n)
-	}
-	at(105, 13)
-	at(110, 14)
-	if _, n := state(110); n != 1.0 {
-		t.Fatalf("requests while awake are not wake-ups: %v", n)
-	}
-	at(200, 14)
-	at(300, 15)
-	if st, n := state(300); st != "active" || n != 2.0 {
-		t.Fatalf("second wake-up: %s %v", st, n)
-	}
-	if _, n := state(300 + 3600*17); n != 0.0 {
-		t.Fatalf("the count restarts at midnight (UTC+8): %v", n)
-	}
-	for _, bad := range []int{59, 3601} {
-		if validateNas(&NasConfig{DiskSleepSeconds: bad}) == nil {
-			t.Fatalf("accepted sleep %d", bad)
-		}
+	s.cfg.DiskIOOnly = true
+	s.Sample(now.Add(500 * time.Second))
+	if s.diskState() != "quiet" {
+		t.Fatal("I/O-only cannot establish spindle state")
 	}
 }
 
-func TestNasPreciseAnswerDoesNotOverrideIO(t *testing.T) {
+func TestNasPreciseAnswerOverridesIO(t *testing.T) {
 	now := time.Now()
 	s := fakeHost(t, "cpu  100 0 50 800 50 0 0 0\n")
 	s.cfg = &NasConfig{Disk: "/dev/sda"}
@@ -289,8 +214,8 @@ func TestNasPreciseAnswerDoesNotOverrideIO(t *testing.T) {
 	s.Sample(now)
 	writeFake(t, stat, "11 1 2 3 5 4 5 6 0 7 8\n")
 	s.Sample(now.Add(5 * time.Second))
-	if st := s.Snapshot(now.Add(5 * time.Second))["disk_state"]; st != "active" {
-		t.Fatalf("requests just completed, so a standby answer is not believed: %v", st)
+	if st := s.Snapshot(now.Add(5 * time.Second))["disk_state"]; st != "standby" {
+		t.Fatalf("standby answer must override recent requests: %v", st)
 	}
 	s.Sample(now.Add(400 * time.Second))
 	if st := s.Snapshot(now.Add(400 * time.Second))["disk_state"]; st != "standby" {
@@ -319,8 +244,8 @@ func TestNasReadAsleep(t *testing.T) {
 	}
 	took = 6 * time.Second
 	s.Sample(now.Add(130 * time.Second))
-	if snap := s.Snapshot(now.Add(130 * time.Second)); reads != 3 || snap["disk_state"] != "active" || nasValue(snap, "disk_wake_count_today") != 1.0 {
-		t.Fatalf("a read that took seconds woke the drive: reads=%d %v", reads, snap)
+	if snap := s.Snapshot(now.Add(130 * time.Second)); reads != 3 || snap["disk_state"] != "standby" || nasValue(snap, "disk_wake_count_today") != 0.0 {
+		t.Fatalf("read duration must not override standby: reads=%d %v", reads, snap)
 	}
 	took = 20 * time.Millisecond
 	state = diskActive

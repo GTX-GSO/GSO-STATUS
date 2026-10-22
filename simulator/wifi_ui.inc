@@ -33,6 +33,9 @@ static void wifi_keyboard_done(lv_event_t *e){
 }
 static bool wifi_form_open(void){return wifi_open&&lv_obj_has_state(wifi_open,LV_STATE_CHECKED);}
 static bool wifi_can_connect(void){
+ /* The first refresh runs while the page is still being built (setting the SSID text raises VALUE_CHANGED), when the
+    password field does not exist yet; reading a missing object hangs LVGL in its assert loop. */
+ if(!wifi_name||!wifi_password)return false;
  const char *ssid=lv_textarea_get_text(wifi_name);if(!ssid[0])return false;
  return wifi_form_open()||lv_textarea_get_text(wifi_password)[0]||(gss_wifi_has_password()&&!strcmp(ssid,gss_wifi_ssid()));
 }
@@ -224,18 +227,28 @@ static void wifi_page(lv_event_t *e){
  wifi_message=small(p,464,360,"",MUTED);lv_obj_set_width(wifi_message,536);lv_label_set_long_mode(wifi_message,LV_LABEL_LONG_DOT);
  /* The keyboard covers the checkbox, buttons and messages only while a field is being edited. */
  wifi_keyboard=lv_keyboard_create(p);
- lv_obj_set_pos(wifi_keyboard,464,264);
+ lv_obj_align(wifi_keyboard,LV_ALIGN_TOP_LEFT,464,264); /* the widget defaults to bottom-centre, so set_pos alone leaves it off-screen */
  lv_obj_set_size(wifi_keyboard,536,140);
  lv_obj_set_style_text_font(wifi_keyboard,&lv_font_montserrat_18,LV_PART_ITEMS);
  lv_obj_add_event_cb(wifi_keyboard,wifi_keyboard_done,LV_EVENT_READY,NULL);
  lv_obj_add_event_cb(wifi_keyboard,wifi_keyboard_done,LV_EVENT_CANCEL,NULL);
  lv_obj_add_flag(wifi_keyboard,LV_OBJ_FLAG_HIDDEN);
- lv_obj_set_style_bg_color(wifi_keyboard,c(INSET),0);
+ /* The LVGL theme paints keys light grey and control keys (checked state) lighter still, so every state is set. */
+ lv_obj_set_style_bg_color(wifi_keyboard,c(PANEL),0);
  lv_obj_set_style_bg_opa(wifi_keyboard,255,0);
- lv_obj_set_style_bg_color(wifi_keyboard,c(PANEL),LV_PART_ITEMS);
- lv_obj_set_style_bg_opa(wifi_keyboard,255,LV_PART_ITEMS);
- lv_obj_set_style_text_color(wifi_keyboard,c(TEXT),LV_PART_ITEMS);
+ lv_obj_set_style_border_width(wifi_keyboard,0,0);
+ lv_obj_set_style_pad_all(wifi_keyboard,4,0);
+ lv_obj_set_style_pad_gap(wifi_keyboard,6,0);
+ lv_obj_set_style_bg_color(wifi_keyboard,c(LINE),LV_PART_ITEMS);
+ lv_obj_set_style_bg_color(wifi_keyboard,c(INSET),LV_PART_ITEMS|LV_STATE_CHECKED);
  lv_obj_set_style_bg_color(wifi_keyboard,c(BLUE),LV_PART_ITEMS|LV_STATE_PRESSED);
+ lv_obj_set_style_bg_opa(wifi_keyboard,255,LV_PART_ITEMS);
+ lv_obj_set_style_bg_opa(wifi_keyboard,255,LV_PART_ITEMS|LV_STATE_CHECKED);
+ lv_obj_set_style_text_color(wifi_keyboard,c(TEXT),LV_PART_ITEMS);
+ lv_obj_set_style_text_color(wifi_keyboard,c(TEXT),LV_PART_ITEMS|LV_STATE_CHECKED);
+ lv_obj_set_style_border_width(wifi_keyboard,0,LV_PART_ITEMS);
+ lv_obj_set_style_shadow_width(wifi_keyboard,0,LV_PART_ITEMS);
+ lv_obj_set_style_radius(wifi_keyboard,8,LV_PART_ITEMS);
  wifi_generation=~0U;
  wifi_scanning_shown=false;
  wifi_connected_shown=false;

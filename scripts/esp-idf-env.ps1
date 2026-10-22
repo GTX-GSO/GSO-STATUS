@@ -1,4 +1,4 @@
-# 从本机 Espressif Installation Manager 登记的安装中加载环境。
+﻿# 从本机 Espressif Installation Manager 登记的安装中加载环境。
 $ErrorActionPreference='Stop'
 $registration='C:/Espressif/tools/eim_idf.json'
 if(!(Test-Path -LiteralPath $registration)){throw "ESP-IDF 安装登记不存在：$registration"}

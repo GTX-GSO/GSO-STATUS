@@ -3,8 +3,10 @@
 #include <string.h>
 static unsigned clamp(unsigned n){return n<10?10:n>100?100:n;}
 static double curve(double lux){
- static const double x[]={0,10,50,150,400,1000},y[]={15,25,40,60,80,100};
- for(unsigned i=1;i<6;i++)if(lux<=x[i])return y[i-1]+(y[i]-y[i-1])*(lux-x[i-1])/(x[i]-x[i-1]);
+ /* This panel is not bright, so full backlight is reached at 100 lx, the study's light level (user choice 2026-10-20);
+    the old curve stayed below 100% until 1000 lx. */
+ static const double x[]={0,10,50,100},y[]={15,30,60,100};
+ for(unsigned i=1;i<4;i++)if(lux<=x[i])return y[i-1]+(y[i]-y[i-1])*(lux-x[i-1])/(x[i]-x[i-1]);
  return 100;
 }
 void gso_brightness_init(gso_brightness *b,bool automatic,unsigned manual){memset(b,0,sizeof(*b));b->automatic=automatic;b->manual=clamp(manual);b->applied=b->target=b->manual;}

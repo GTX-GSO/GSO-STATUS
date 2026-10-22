@@ -50,8 +50,9 @@ static inline void gss_present_add(gss_present_state *s,gss_rect r,int width,int
  list->rect[list->count++]=r;
 }
 /* Fills out[] (capacity GSS_PRESENT_MAX_PLAN) with the areas to convert for the frame just rendered, then makes the
-   current areas the previous ones. A single full-frame area is returned for the resync frames and whenever the
-   separate areas already cover most of the picture. */
+   current areas the previous ones. A single full-frame area is returned for the resync frames. When the separate areas
+   already cover most of the picture they are converted as their bounding box in one operation: dragging the card strip
+   changes 75% of the screen, and the sidebar beside it is not converted again. */
 static inline unsigned gss_present_plan(gss_present_state *s,bool flipped,gss_rect *out,int width,int height){
  if(flipped!=s->flipped){s->flipped=flipped;s->full_frames=2;}
  gss_rect full={0,0,width-1,height-1};
@@ -61,7 +62,12 @@ static inline unsigned gss_present_plan(gss_present_state *s,bool flipped,gss_re
   int64_t covered=0;
   for(unsigned i=0;i<s->previous.count;i++){out[count++]=s->previous.rect[i];covered+=gss_rect_area(s->previous.rect[i]);}
   for(unsigned i=0;i<s->current.count;i++){out[count++]=s->current.rect[i];covered+=gss_rect_area(s->current.rect[i]);}
-  everything=count==0||covered*5>=gss_rect_area(full)*3;
+  everything=count==0;
+  if(!everything&&covered*5>=gss_rect_area(full)*3){
+   gss_rect all=out[0];
+   for(unsigned i=1;i<count;i++)all=gss_rect_union(all,out[i]);
+   out[0]=all;count=1;
+  }
  }
  if(everything){out[0]=full;count=1;}
  if(s->full_frames>0)s->full_frames--;

@@ -23,12 +23,16 @@ shutil.copy2(root/'tools/presentmon/PresentMon-2.6.0-x64.exe',output/'GSW/Presen
 gsw_version=ET.parse(root/'gsw/GSW.csproj').getroot().findtext('.//Version')
 private_bundle=output/f'GSO-STATUS-WIN-{gsw_version}-win-x64.zip'
 shutil.copy2(root/'scripts/install-cpu-sensor.ps1',output/'GSW/install-cpu-sensor.ps1')
+shutil.copy2(root/'scripts/install-gsw.ps1',output/'GSW/install-gsw.ps1')
+shutil.copy2(root/'config/gsw.example.json',output/'GSW/gsw.example.json')
 shutil.copy2(root/'tools/sensors/PawnIO_setup.exe',output/'GSW/PawnIO_setup.exe')
+# The working gsw.json next to the build carries this machine's GSN write token; the bundle ships only the example.
 with zipfile.ZipFile(private_bundle,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=1) as bundle:
     for path in (output/'GSW').rglob('*'):
-        if path.is_file():bundle.write(path,path.relative_to(output/'GSW'))
+        if path.is_file() and path.relative_to(output/'GSW').as_posix()!='gsw.json':bundle.write(path,path.relative_to(output/'GSW'))
+with zipfile.ZipFile(private_bundle) as bundle:assert 'gsw.json' not in bundle.namelist(),'gsw.json must not be bundled'
 manifest=[]
-targets=['GSS-Simulator.exe','GSW/GSW.exe','GSW/PresentMon-2.6.0-x64.exe',private_bundle.name,'NAS/GSN-0.1.33-arm64.docker.tar']
+targets=['GSS-Simulator.exe','GSW/GSW.exe','GSW/PresentMon-2.6.0-x64.exe',private_bundle.name,'NAS/GSN-0.1.35-arm64.docker.tar']
 gss_manifest=output/'GSS/flash-manifest.json'
 if gss_manifest.exists():
     gss=json.loads(gss_manifest.read_text(encoding='utf-8'))

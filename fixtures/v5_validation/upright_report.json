@@ -1,0 +1,31 @@
+{
+  "geometry_changed": false,
+  "rotation_determinant": 1,
+  "orientation": "screen right short edge on bed, board uppermost",
+  "read_back_watertight": true,
+  "read_back_winding_consistent": true,
+  "print_bounds_mm": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      71.9,
+      70.28,
+      165.6
+    ]
+  ],
+  "print_dimensions_mm": [
+    71.9,
+    70.28,
+    165.6
+  ],
+  "volume_difference_from_v5_mm3": 0.006476383474364411,
+  "round_trip_symmetric_difference_mm3": [
+    0.005527403390565769,
+    0.012912836639166493
+  ],
+  "sliced": false,
+  "printed": false
+}
